@@ -6,6 +6,6 @@ compile:
 	javac -sourcepath src -d out/ src/**/*.java
 
 run:
-	java -cp out/ HomeWorkApp 
+	java -cp out/ App 
 
 compile-run: compile run
