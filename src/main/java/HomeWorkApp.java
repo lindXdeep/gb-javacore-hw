@@ -9,6 +9,7 @@ public class HomeWorkApp {
     printThreeWords();
     checkSumSign();
     printColor();
+    compareNumbers();
   }
 
   public static void printThreeWords() {
@@ -21,11 +22,11 @@ public class HomeWorkApp {
     int a = 1;
     int b = 2;
 
-    int c  = a + b;
+    int c = a + b;
 
     if (c >= 0) {
       System.out.println("Сумма положительная");
-    }else{
+    } else {
       System.out.println("Сумма отрицательная");
     }
   }
@@ -35,10 +36,17 @@ public class HomeWorkApp {
 
     if (value <= 0) {
       System.out.println("Красный");
-    }else if(value > 0 & value <= 100 ){
+    } else if (value > 0 & value <= 100) {
       System.out.println("Желтый");
-    }else{
+    } else {
       System.out.println("Зеленый");
     }
+  }
+
+  public static void compareNumbers() {
+    int a = 10;
+    int b = 20;
+
+    System.out.println((a >= b) ? "a >= b" : "a < b");
   }
 }
