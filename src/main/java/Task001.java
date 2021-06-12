@@ -1,7 +1,7 @@
 /**
- * App
+ * Task001
  */
-public class App {
+public class Task001 {
 
   private static int[] array = { 1, 1, 0, 0, 1, 0, 1, 1, 0, 0 };
 
