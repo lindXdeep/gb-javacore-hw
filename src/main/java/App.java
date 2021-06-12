@@ -17,6 +17,10 @@ public class App {
     printPositiveOrNegativeNumber(10);
 
     printString("Dog", 10);
+    
+    System.out.printf("%4d - %s \n", 8, yearLeap(8) ? " високосный" : " не високосный");
+    System.out.printf("%4d - %s \n", 1000, yearLeap(1000) ? " високосный" : " не високосный");
+    System.out.printf("%4d - %s \n", 800, yearLeap(800) ? " високосный" : " не високосный");
   }
 
   public static boolean ariaSum(final int a, final int b) {
@@ -32,12 +36,16 @@ public class App {
   }
 
   public static void printString(final String str, final int col) {
-    
-    if (col > 0 ) {
+
+    if (col > 0) {
       System.out.println(str);
-      printString(str, col-1);
+      printString(str, col - 1);
     }
-    
+
     return;
+  }
+
+  public static boolean yearLeap(final int year) {
+    return (year % 400 == 0) ? true : (year % 4 == 0) & (year % 100 != 0);
   }
 }
