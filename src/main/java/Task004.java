@@ -2,7 +2,7 @@
 /**
  * Task 004
  */
-public class App {
+public class Task004 {
 
   private static int SIZE = 7;
   private static int[][] arr = new int[SIZE][SIZE];
