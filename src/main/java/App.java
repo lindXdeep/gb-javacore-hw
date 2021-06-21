@@ -29,6 +29,7 @@ public class App {
     }
 
     initField(DOT_EMPTY);
+    printField();
 
     gameLoop();
   }
@@ -59,12 +60,91 @@ public class App {
 
   private static void gameLoop() {
     do {
-      printField();
       humanTurn();
       printField();
+
+      checkPreWin(DOT_COMP, DOT_HUMAN);
+
+      checkDeadHeat();
+
       compTurn();
+      printField();
 
     } while (GAME);
+  }
+
+  private static void checkPreWin(final char dot_me, final char dot_enemy) {
+
+    int countPreWin;
+
+    for (int i = 0; i < SIZE; i++) {
+
+      countPreWin = 0;
+
+      for (int j = 0; j < SIZE; j++) {
+        countPreWin = (field[i][j] == dot_enemy) ? countPreWin + 1 : countPreWin;
+      }
+      if (countPreWin == WINSIZE) {
+        for (int j = 0; j < SIZE; j++) {
+          field[i][j] = (field[i][j] == DOT_EMPTY) ? dot_me : field[i][j];
+        }
+      }
+    }
+
+    for (int j = 0; j < SIZE; j++) {
+
+      countPreWin = 0;
+
+      for (int i = 0; i < SIZE; i++) {
+        countPreWin = (field[i][j] == dot_enemy) ? countPreWin + 1 : countPreWin;
+      }
+      if (countPreWin == WINSIZE) {
+        for (int i = 0; i < SIZE; i++) {
+          field[i][j] = (field[i][j] == DOT_EMPTY) ? dot_me : field[i][j];
+        }
+      }
+    }
+
+    countPreWin = 0;
+
+    for (int i = 0; i < SIZE; i++) {
+
+      countPreWin = (field[i][i] == dot_enemy) ? countPreWin + 1 : countPreWin;
+
+      if (countPreWin == WINSIZE) {
+        for (int j = 0; j < SIZE; j++) {
+          field[j][j] = (field[j][j] == DOT_EMPTY) ? dot_me : field[j][j];
+        }
+      }
+    }
+
+    countPreWin = 0;
+
+    for (int i = 0; i < SIZE; i++) {
+
+      countPreWin = (field[i][SIZE-i-1] == dot_enemy) ? countPreWin + 1 : countPreWin;
+
+      if (countPreWin == WINSIZE) {
+        for (int j = 0; j < SIZE; j++) {
+          field[j][SIZE-j-1] = (field[j][SIZE-j-1] == DOT_EMPTY) ? dot_me : field[j][SIZE-j-1];
+        }
+      }
+    }
+  }
+
+  private static void checkDeadHeat() {
+
+    GAME = false;
+
+    for (char[] cs : field)
+      for (char c : cs)
+        if (c == DOT_EMPTY)
+          GAME = true;
+
+    if (GAME == false) {
+      System.out.println("\t Ничья!\n");
+      Runtime.getRuntime().exit(0);
+    }
   }
 
   private static void compTurn() {
