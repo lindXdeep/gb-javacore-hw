@@ -18,6 +18,9 @@ public class App {
   private static boolean GAME;
   private static char[][] field;
 
+  private static boolean turn_comp = false;
+  private static boolean turn_human = false;
+
   private static int y_x;
   private static int x_y;
   private static int l_r;
@@ -68,7 +71,7 @@ public class App {
       humanTurn();
       printField();
 
-      checkPreWin(DOT_COMP, DOT_HUMAN);
+      
 
       checkWin(DOT_HUMAN);
 
@@ -84,7 +87,7 @@ public class App {
 
   }
 
-  private static void checkPreWin(final char dot_me, final char dot_enemy) {
+  private static boolean checkPreWin(final char dot_me, final char dot_enemy) {
 
     int countPreWin;
 
@@ -99,7 +102,7 @@ public class App {
         for (int j = 0; j < SIZE; j++) {
           if (field[i][j] == DOT_EMPTY) {
             field[i][j] = dot_me;
-            break;
+            return true;
           }
         }
       }
@@ -116,7 +119,7 @@ public class App {
         for (int i = 0; i < SIZE; i++) {
           if (field[i][j] == DOT_EMPTY) {
             field[i][j] = dot_me;
-            break;
+            return true;
           }
         }
       }
@@ -132,7 +135,7 @@ public class App {
         for (int j = 0; j < SIZE; j++) {
           if (field[j][j] == DOT_EMPTY) {
             field[j][j] = dot_me;
-            break;
+            return true;
           }
         }
       }
@@ -148,11 +151,12 @@ public class App {
         for (int j = 0; j < SIZE; j++) {
           if (field[j][SIZE - j - 1] == DOT_EMPTY) {
             field[j][SIZE - j - 1] = dot_me;
-            break;
+            return true;
           }
         }
       }
     }
+    return false;
   }
 
   private static void checkDeadHeat() {
@@ -171,6 +175,10 @@ public class App {
   }
 
   private static void compTurn() {
+
+    if (checkPreWin(DOT_COMP, DOT_HUMAN)) {
+      return;
+    }
 
     Random rand = new Random();
 
