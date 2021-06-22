@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -71,20 +72,91 @@ public class App {
       humanTurn();
       printField();
 
-      
-
-      checkWin(DOT_HUMAN);
+      if (checkWin(DOT_HUMAN)) {
+        printField();
+        System.out.println("\t Вы победили!!!\n");
+        break;
+      }
 
       checkDeadHeat();
 
       compTurn();
       printField();
 
+      if (checkWin(DOT_COMP)) {
+        printField();
+        System.out.println("\n Вы проиграли!");
+        break;
+      }
+
     } while (GAME);
   }
 
-  private static void checkWin(final char dot) {
+  private static boolean checkWin(final char dot) {
 
+    int checkWinCounter;
+
+    for (int i = 0; i < SIZE; i++) {
+
+      checkWinCounter = 0;
+
+      for (int j = 0; j < SIZE; j++) {
+        checkWinCounter = (field[i][j] == dot) ? checkWinCounter + 1 : checkWinCounter;
+        if (checkWinCounter == WINSIZE) {
+          initField(DOT_EMPTY);
+          for (int w = WINSIZE; w > 0; w--) {
+            field[i][w] = dot;
+          }
+          return true;
+        }
+      }
+    }
+
+    for (int i = 0; i < SIZE; i++) {
+
+      checkWinCounter = 0;
+
+      for (int j = 0; j < SIZE; j++) {
+        checkWinCounter = (field[j][i] == dot) ? checkWinCounter + 1 : checkWinCounter;
+        if (checkWinCounter == WINSIZE) {
+          initField(DOT_EMPTY);
+          for (int w = WINSIZE; w > 0; w--) {
+            field[w][i] = dot;
+          }
+          return true;
+        }
+      }
+    }
+
+    for (int i = 0; i < SIZE; i++) {
+
+      checkWinCounter = 0;
+
+      checkWinCounter = (field[i][i] == dot) ? checkWinCounter + 1 : checkWinCounter;
+      if (checkWinCounter == WINSIZE) {
+        initField(DOT_EMPTY);
+        for (int w = WINSIZE; w > 0; w--) {
+          field[i][w] = dot;
+        }
+        return true;
+      }
+    }
+
+    for (int i = 0; i < SIZE; i++) {
+
+      checkWinCounter = 0;
+
+      checkWinCounter = (field[i][SIZE - i -1] == dot) ? checkWinCounter + 1 : checkWinCounter;
+      if (checkWinCounter == WINSIZE) {
+        initField(DOT_EMPTY);
+        for (int w = WINSIZE; w > 0; w--) {
+          field[i][SIZE - w - 1] = dot;
+        }
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private static boolean checkPreWin(final char dot_me, final char dot_enemy) {
