@@ -18,6 +18,11 @@ public class App {
   private static boolean GAME;
   private static char[][] field;
 
+  private static int y_x;
+  private static int x_y;
+  private static int l_r;
+  private static int r_l;
+
   public static void main(String[] args) {
 
     try {
@@ -65,12 +70,18 @@ public class App {
 
       checkPreWin(DOT_COMP, DOT_HUMAN);
 
+      checkWin(DOT_HUMAN);
+
       checkDeadHeat();
 
       compTurn();
       printField();
 
     } while (GAME);
+  }
+
+  private static void checkWin(final char dot) {
+
   }
 
   private static void checkPreWin(final char dot_me, final char dot_enemy) {
@@ -84,9 +95,12 @@ public class App {
       for (int j = 0; j < SIZE; j++) {
         countPreWin = (field[i][j] == dot_enemy) ? countPreWin + 1 : countPreWin;
       }
-      if (countPreWin == WINSIZE) {
+      if (countPreWin == WINSIZE - 1) {
         for (int j = 0; j < SIZE; j++) {
-          field[i][j] = (field[i][j] == DOT_EMPTY) ? dot_me : field[i][j];
+          if (field[i][j] == DOT_EMPTY) {
+            field[i][j] = dot_me;
+            break;
+          }
         }
       }
     }
@@ -98,9 +112,12 @@ public class App {
       for (int i = 0; i < SIZE; i++) {
         countPreWin = (field[i][j] == dot_enemy) ? countPreWin + 1 : countPreWin;
       }
-      if (countPreWin == WINSIZE) {
+      if (countPreWin == WINSIZE - 1) {
         for (int i = 0; i < SIZE; i++) {
-          field[i][j] = (field[i][j] == DOT_EMPTY) ? dot_me : field[i][j];
+          if (field[i][j] == DOT_EMPTY) {
+            field[i][j] = dot_me;
+            break;
+          }
         }
       }
     }
@@ -111,9 +128,12 @@ public class App {
 
       countPreWin = (field[i][i] == dot_enemy) ? countPreWin + 1 : countPreWin;
 
-      if (countPreWin == WINSIZE) {
+      if (countPreWin == WINSIZE - 1) {
         for (int j = 0; j < SIZE; j++) {
-          field[j][j] = (field[j][j] == DOT_EMPTY) ? dot_me : field[j][j];
+          if (field[j][j] == DOT_EMPTY) {
+            field[j][j] = dot_me;
+            break;
+          }
         }
       }
     }
@@ -122,11 +142,14 @@ public class App {
 
     for (int i = 0; i < SIZE; i++) {
 
-      countPreWin = (field[i][SIZE-i-1] == dot_enemy) ? countPreWin + 1 : countPreWin;
+      countPreWin = (field[i][SIZE - i - 1] == dot_enemy) ? countPreWin + 1 : countPreWin;
 
-      if (countPreWin == WINSIZE) {
+      if (countPreWin == WINSIZE - 1) {
         for (int j = 0; j < SIZE; j++) {
-          field[j][SIZE-j-1] = (field[j][SIZE-j-1] == DOT_EMPTY) ? dot_me : field[j][SIZE-j-1];
+          if (field[j][SIZE - j - 1] == DOT_EMPTY) {
+            field[j][SIZE - j - 1] = dot_me;
+            break;
+          }
         }
       }
     }
@@ -148,12 +171,13 @@ public class App {
   }
 
   private static void compTurn() {
+
+    Random rand = new Random();
+
+    int x;
+    int y;
+
     if (SILLY_MODE) {
-
-      Random rand = new Random();
-
-      int x;
-      int y;
 
       do {
 
