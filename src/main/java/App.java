@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -18,15 +17,6 @@ public class App {
 
   private static boolean GAME;
   private static char[][] field;
-
-  private static boolean turn_comp = false;
-  private static boolean turn_human = false;
-
-  private static int y_x;
-  private static int x_y;
-  private static int l_r;
-  private static int r_l;
-
   public static void main(String[] args) {
 
     try {
@@ -85,7 +75,7 @@ public class App {
 
       if (checkWin(DOT_COMP)) {
         printField();
-        System.out.println("\n Вы проиграли!");
+        System.out.println("\t Вы проиграли!\n");
         break;
       }
 
@@ -128,34 +118,35 @@ public class App {
       }
     }
 
-    for (int i = 0; i < SIZE; i++) {
+    checkWinCounter = 0;
 
-      checkWinCounter = 0;
+    for (int i = 0; i < SIZE; i++) {
 
       checkWinCounter = (field[i][i] == dot) ? checkWinCounter + 1 : checkWinCounter;
+
       if (checkWinCounter == WINSIZE) {
         initField(DOT_EMPTY);
         for (int w = WINSIZE; w > 0; w--) {
-          field[i][w] = dot;
+          field[w][w] = dot;
         }
         return true;
       }
     }
+
+    checkWinCounter = 0;
 
     for (int i = 0; i < SIZE; i++) {
 
-      checkWinCounter = 0;
+      checkWinCounter = (field[i][SIZE - i - 1] == dot) ? checkWinCounter + 1 : checkWinCounter;
 
-      checkWinCounter = (field[i][SIZE - i -1] == dot) ? checkWinCounter + 1 : checkWinCounter;
       if (checkWinCounter == WINSIZE) {
         initField(DOT_EMPTY);
         for (int w = WINSIZE; w > 0; w--) {
-          field[i][SIZE - w - 1] = dot;
+          field[w][SIZE - w - 1] = dot;
         }
         return true;
       }
     }
-
     return false;
   }
 
@@ -270,8 +261,10 @@ public class App {
 
       field[y][x] = DOT_COMP;
 
-    } else {
+      SILLY_MODE = false;
 
+    } else {
+      
     }
   }
 
