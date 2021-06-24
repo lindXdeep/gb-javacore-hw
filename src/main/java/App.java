@@ -261,9 +261,9 @@ public class App {
 
       field[y][x] = DOT_COMP;
 
-      SILLY_MODE = false;
-
     } else {
+
+     // TODO: доделать стратегию
       
     }
   }
