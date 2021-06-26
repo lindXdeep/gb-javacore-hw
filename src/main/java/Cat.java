@@ -1,6 +1,10 @@
 public class Cat extends Animal {
 
-  public Cat(final String name, int run, int swim) {
+  private final int FEDUP;
+
+  
+  public Cat(final String name, int run, int swim, int fedup) {
     super(name, run, swim);
+    this.FEDUP = fedup;
   }
 }
