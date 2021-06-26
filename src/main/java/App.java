@@ -1,42 +1,101 @@
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * App
  */
 public class App {
 
+  public static Cat[] cats = {
+    new Cat("Cat1", 300, 0),
+    new Cat("Cat2", 200, 0),
+    new Cat("Cat3", 150, 0),
+    new Cat("Cat4", 450, 0),
+    new Cat("Cat5", 100, 0),
+  };
+
+  public static Dog[] dogs = {
+    new Dog("Dog1", 300, 10),
+    new Dog("Dog2", 500, 10),
+    new Dog("Dog3", 400, 20),
+    new Dog("Dog4", 650, 30),
+    new Dog("Dog5", 450, 25),
+  };
+
+  public static Pool[] pools = {
+    new Pool(20),
+    new Pool(30),
+    new Pool(40),
+    new Pool(50),
+    new Pool(60),
+    new Pool(70)
+  };
+
+  public static Road[] roads = {
+    new Road(200),
+    new Road(300),
+    new Road(400),
+    new Road(500),
+    new Road(600),
+    new Road(700)
+  };
+
   public static void main(String[] args) {
 
-    Plate plate = new Plate(100);
-    plate.setEat(90);
+    System.out.printf("\n Котов: %s \n", cats.length);
+    System.out.printf("\n Собак: %s \n", dogs.length);
+    System.out.println("\n----------------------------\n");
 
-    System.out.println("Еды в миске: " + plate.getCapacity());
+    System.out.println("Dog challange: ");
+    challange("Забег: ", roads, dogs);
 
-    Cat[] cats = { 
-      new Cat(22), 
-      new Cat(17), 
-      new Cat(11), 
-      new Cat(21), 
-      new Cat(25)
-    };
+    System.out.println("Cat challange: ");
+    challange("Забег: ", roads, cats);
 
-    
-    for (int i = 0; i < cats.length; i++) {
-      
-      cats[i].eat(plate);
+    System.out.println("Dog challange: ");
+    challange("Заплыв: ", pools, dogs);
 
-      if (!cats[i].getStatus()) {
-        System.out.println("кот сьел " + cats[i].getEat());
-        plate.addEat(20);
+    System.out.println("Cat challange: ");
+    challange("Заплыв: ", pools, cats);
+  }
 
-        cats[i].eat(plate);
+  public static void challange(final String challangeName, final Obstacle[] obstacles, Animal[] animals){
+
+    for (int j = 0; j < obstacles.length; j++) {
+
+      if (animals.length == 0) {
+        return;
+      }else {
+        System.out.println("\n\t" + challangeName + (j+1) + ": ");
       }
-    }
-      
-    System.out.println(plate.getValue());
 
+      List<Animal> animalz = new ArrayList<>(); 
 
-    for (Cat cat : cats) {
-      System.out.println("Кот сожрал еды: " + cat.getEat()  + " : " 
-                                            + ((cat.getStatus()) ? "кот сыт" : "кот еще голодный"));
+      for (int i = 0; i < animals.length; i++) {
+
+        if (obstacles[0].getClass().getTypeName() == "Road") {
+          if (animals[i].run(obstacles[j])) {
+            animalz.add(animals[i]);
+          }
+        }
+
+        if (obstacles[0].getClass().getTypeName() == "Pool") {
+          if (animals[i].swim(obstacles[j])) {
+            animalz.add(animals[i]);
+          }
+        }
+      }
+
+      animals = new Animal[animalz.size()];
+      for (int i = 0; i < animals.length; i++) {
+        animals[i] = animalz.get(i);
+      }
+
+      System.out.println();
     }
   }
 }
