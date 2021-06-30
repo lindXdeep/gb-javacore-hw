@@ -3,18 +3,29 @@
  */
 public class Plate {
 
-  private final  int CAPACITY; 
-  private int zhranina;
+  private final int CAPACITY;
+  private int eatCount;
 
   public Plate(int CAPACITY) {
     this.CAPACITY = CAPACITY;
   }
 
-  public int getEat() {
-    return this.zhranina;
+  public void setEat(int eatCount) {
+    this.eatCount = eatCount;
   }
 
-  public void setEat(int zhranina) {
-    this.zhranina = zhranina;
+  public int getEat() {
+    return this.eatCount;
+  }
+
+  public int popEat(int eat) {
+
+    if (eatCount < eat) {
+      return 0;
+    }
+
+    eatCount -= eat;
+
+    return eat;
   }
 }

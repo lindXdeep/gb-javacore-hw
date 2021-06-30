@@ -5,6 +5,7 @@ abstract class Animal {
   private int MAX_SWIM;
 
   public Animal(final String name) {
+    this(name, 0, 0);
     this.name = name;
   }
 
