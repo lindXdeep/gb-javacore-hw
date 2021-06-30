@@ -14,6 +14,10 @@ public class Plate {
     this.eatCount = eatCount;
   }
 
+  public void addEat(int eat){
+    this.eatCount =+ eat;
+  }
+
   public int getEat() {
     return this.eatCount;
   }

@@ -25,4 +25,8 @@ public class Cat extends Animal {
     fedup = true;
     return fedup;
   }
+
+  public boolean isFedUp() {
+    return this.fedup;
+  }
 }

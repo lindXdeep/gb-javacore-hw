@@ -15,6 +15,10 @@ abstract class Animal {
     this.MAX_SWIM = MAX_SWIM;
   }
 
+  public String getName(){
+    return this.name;
+  }
+
   public boolean run(final Obstacle road) {
 
     int val = road.getLength();
