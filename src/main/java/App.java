@@ -17,9 +17,13 @@ public class App {
 
     if (args.length != 0 && args.length == 1) {
       isConsoleGame = chkGameMode(args[0]);
-    } 
+    }
 
-    game = new Console(FIELD_SIZE, WIN_SIZE);
+    if (isConsoleGame) {
+      game = new Console(FIELD_SIZE, WIN_SIZE);
+    } else {
+      game = new Gui(FIELD_SIZE, WIN_SIZE);
+    }
   }
 
   public static boolean chkGameMode(final String flag) {
