@@ -1,7 +1,7 @@
 package entities;
 
+import java.util.jar.Attributes.Name;
 
-import obstacles.Obstacle;
 import obstacles.RunningTrack;
 import obstacles.Wall;
 
@@ -12,10 +12,12 @@ public class Human implements Entity {
 
   private final int MAX_RUN;
   private final int MAX_JUMP;
+  private final String name;
 
-  public Human(final int MAX_RUN, final int MAX_JUMP) {
+  public Human(final int MAX_RUN, final int MAX_JUMP, final String name) {
     this.MAX_RUN = MAX_RUN;
     this.MAX_JUMP = MAX_JUMP;
+    this.name = name;
   }
 
   @Override
@@ -26,5 +28,10 @@ public class Human implements Entity {
   @Override
   public boolean jump(final Wall wall) {
     return wall.getLength() <= MAX_JUMP;
+  }
+
+  @Override
+  public String getName() {
+    return name;
   }
 }
