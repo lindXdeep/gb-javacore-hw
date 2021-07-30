@@ -1,6 +1,6 @@
 public class App {
 
-  public static final int SIZE = 4;
+  public static final int SIZE = 5;
 
   public static String array[][] = new String[SIZE][SIZE];
 
@@ -22,11 +22,9 @@ public class App {
       throw new MyArraySizeException("Exception: Array" + arr.getClass().getSimpleName() + " out of index");
     }
 
-    for (int i = 0; i < arr.length; i++) {
-      for (int j = 0; j < arr[i].length; j++) {
-        if (arr[i].length > 4) {
-          throw new MyArraySizeException("Execption: Array" + arr.getClass().getCanonicalName() + " out of index");
-        }
+    for (int i = 0; i < arr.length * arr.length; i++) {
+      if (arr[i / arr.length].length > 4) {
+        throw new MyArraySizeException("Execption: Array" + arr.getClass().getCanonicalName() + " out of index");
       }
     }
 
