@@ -1,6 +1,6 @@
 public class App {
 
-  public static final int SIZE = 5;
+  public static final int SIZE = 4;
 
   public static String array[][] = new String[SIZE][SIZE];
 
@@ -50,7 +50,7 @@ public class App {
     for (String[] s1 : arr) {
       for (String s2 : s1) {
         System.out.print(s2 + " ");
-      }
+      }r
       System.out.println();
     }
   }
