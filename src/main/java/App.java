@@ -7,10 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-
-/**
- * App
- */
 public class App {
 
   /**
@@ -40,6 +36,29 @@ public class App {
      */
     countWords(arrStr);
 
+    /**
+     * Написать простой класс ТелефонныйСправочник, который хранит в себе список
+     * фамилий и телефонных номеров.
+     */
+    PhoneBook phoneBook = new PhoneBook();
+
+    phoneBook.add("lastname1", "111-222-333");
+    phoneBook.add("lastname1", "111-222-444");
+    phoneBook.add("lastname1", "111-222-555");
+
+    phoneBook.add("lastname2", "112-222-333");
+    phoneBook.add("lastname2", "113-222-444");
+    phoneBook.add("lastname2", "114-222-555");
+
+    phoneBook.add("lastname3", "212-222-333");
+    phoneBook.add("lastname4", "313-222-444");
+    phoneBook.add("lastname5", "214-222-555");
+
+    System.out.println("lastname1: " + phoneBook.get("lastname1"));
+    System.out.println("lastname2: " + phoneBook.get("lastname2"));
+    System.out.println("lastname3: " + phoneBook.get("lastname3"));
+    System.out.println("lastname4: " + phoneBook.get("lastname4"));
+    System.out.println("lastname5: " + phoneBook.get("lastname5"));
   }
 
   private static void countWords(String[] arr) {
@@ -53,9 +72,8 @@ public class App {
       elms.put(str, elms.get(str) + 1);
     }
 
-    elms.forEach(
-      (k,v) -> System.out.println(k + " = " + v)
-    );
+    elms.forEach((k, v) -> System.out.println(k + " = " + v));
+
   }
 
   private static void distinct(final String[] arr) {
