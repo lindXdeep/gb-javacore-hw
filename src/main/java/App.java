@@ -1,14 +1,22 @@
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
+
 
 /**
  * App
  */
 public class App {
 
+  /**
+   * 1. Создать массив с набором слов (10-20 слов, должны встречаться
+   * повторяющиеся).
+   */
   private static String[] arrStr = {
 
       "Sale", "Mandamus", "abhorreant", "deseruisse", "mea",
@@ -22,20 +30,44 @@ public class App {
   public static void main(String[] args) {
 
     /**
-     * Создать массив с набором слов (10-20 слов, должны встречаться
-     * повторяющиеся). Найти и вывести список уникальных слов, из которых состоит
-     * массив (дубликаты не считаем).
+     * 2. Найти и вывести список уникальных слов, из которых состоит массив
+     * (дубликаты не считаем).
      */
+    distinct(arrStr);
 
-    show("Before:", Arrays.asList(arrStr));
+    /**
+     * 3. Посчитать сколько раз встречается каждое слово.
+     */
+    countWords(arrStr);
 
-    Set<String> sets = new HashSet<>(20);
-    sets.addAll(Arrays.asList(arrStr));
-
-    show("After:", sets);
   }
 
-  private static <E> void show(final String comment, final Collection<E> c) {
+  private static void countWords(String[] arr) {
+
+    Map<String, Integer> elms = new HashMap<>(arr.length);
+
+    for (String str : arr) {
+      if (!elms.containsKey(str)) {
+        elms.put(str, 0);
+      }
+      elms.put(str, elms.get(str) + 1);
+    }
+
+    elms.forEach(
+      (k,v) -> System.out.println(k + " = " + v)
+    );
+  }
+
+  private static void distinct(final String[] arr) {
+    showSet("Before:", Arrays.asList(arr));
+
+    Set<String> sets = new HashSet<>(20);
+    sets.addAll(Arrays.asList(arr));
+
+    showSet("After:", sets);
+  }
+
+  private static <E> void showSet(final String comment, final Collection<E> c) {
 
     System.out.println("\n" + comment + "\n");
 
