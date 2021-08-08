@@ -1,4 +1,4 @@
-package io.lindx.jfx;
+package io.lindx.july_chat.chat_app;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -13,20 +13,17 @@ public class App extends Application {
 
   public static void main(String[] args) {
     launch(args);
-    ;
   }
 
   @Override
-  public void start(Stage stage) throws Exception {
-
+  public void start(Stage primaryStage) throws Exception {
     FXMLLoader loader = new FXMLLoader();
-    loader.setLocation(getClass().getResource("/sample.fxml"));
-
+    loader.setLocation(this.getClass().getResource("/july_chat_main.fxml"));
     Parent parent = loader.load();
 
     Scene scene = new Scene(parent);
-    stage.setScene(scene);
-    stage.show();
-
+    primaryStage.setScene(scene);
+    primaryStage.setTitle("July chat");
+    primaryStage.show();
   }
 }
