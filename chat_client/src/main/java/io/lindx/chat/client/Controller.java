@@ -58,5 +58,7 @@ public class Controller implements Initializable {
     
     ObservableList<String> list = FXCollections.observableArrayList("User1", "User1", "User1", "User1", "User1");
     contactList.setItems(list);
+
+    System.out.println(contactList.getSelectionModel().getSelectedItem());
   }
 }
