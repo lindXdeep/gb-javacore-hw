@@ -41,13 +41,15 @@ public class Controller implements Initializable {
   @FXML
   public void sendMessage(ActionEvent actionEvent) {
 
+    String user = contactList.getSelectionModel().getSelectedItem();
+
     StringBuilder msg = new StringBuilder(inputField.getText());
 
     if (!msg.isEmpty()) {
 
       mainChatArea.appendText(
 
-          "ME:\t".concat(msg.toString()).concat("\n"));
+          "ME".concat((user != null ? " -> " + user : "")).concat(":\t").concat(msg.toString()).concat("\n"));
 
       inputField.clear();
     }
@@ -55,10 +57,8 @@ public class Controller implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    
+
     ObservableList<String> list = FXCollections.observableArrayList("User1", "User1", "User1", "User1", "User1");
     contactList.setItems(list);
-
-    System.out.println(contactList.getSelectionModel().getSelectedItem());
   }
 }
