@@ -10,13 +10,7 @@
     "README.md": false,
   },
 
-  "java.home": "/home/lindx/dev-libs/java/jdk-14.0.1",
-  "java.project.exportJar.targetPath": "${workspaceFolder}/App.jar",
-  "java.project.referencedLibraries": [
-    "lib/*.jar",
-    "lib/**/*.jar"
-  ],
-
+  
   //если нет сборщика
   "java.project.sourcePaths": [
     "src/main/java"
