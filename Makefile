@@ -8,4 +8,11 @@ compile:
 run:
 	mvn -pl chat_client javafx:run
 
+srv-compile-run:
+	mvn -pl chat_server package
+
+cln-compile-run: compile run
+
 compile-run: compile run
+
+

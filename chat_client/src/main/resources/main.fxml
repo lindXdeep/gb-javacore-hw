@@ -10,25 +10,32 @@
 
   <VBox fx:id="mainChatPanel" visible="true">
 
-    <MenuBar>
-      <Menu text="File">
-        <MenuItem text="item" onAction="#mockAction" />
-        <MenuItem text="item" onAction="#mockAction" />
-        <MenuItem text="Exit" onAction="#exit" />
-      </Menu>
-      <Menu text="Edit">
-        <MenuItem text="item" onAction="#mockAction" />
-        <MenuItem text="item" onAction="#mockAction" />
-      </Menu>
-      <Menu text="View">
-        <MenuItem text="item" onAction="#mockAction" />
-        <MenuItem text="item" onAction="#mockAction" />
-      </Menu>
-      <Menu text="Help">
-        <MenuItem text="item" onAction="#mockAction" />
-        <MenuItem text="item" onAction="#mockAction" />
-      </Menu>
-    </MenuBar>
+    <HBox>
+      <MenuBar>
+        <Menu text="File">
+          <MenuItem text="item" onAction="#mockAction" />
+          <MenuItem text="item" onAction="#mockAction" />
+          <MenuItem text="Exit" onAction="#exit" />
+        </Menu>
+        <Menu text="Edit">
+          <MenuItem text="item" onAction="#mockAction" />
+          <MenuItem text="item" onAction="#mockAction" />
+        </Menu>
+        <Menu text="View">
+          <MenuItem text="item" onAction="#mockAction" />
+          <MenuItem text="item" onAction="#mockAction" />
+        </Menu>
+        <Menu text="Help">
+          <MenuItem text="item" onAction="#mockAction" />
+          <MenuItem text="item" onAction="#mockAction" />
+        </Menu>
+      </MenuBar>
+
+      <TextField fx:id="serverAddres"/>
+      <Button fx:id="btnConnect" text="Connect" onAction="#connectToServer" />
+      <Button fx:id="btnDisconnect" text="Disconnect" onAction="#disconnectServer" />
+    </HBox>
+
 
     <HBox VBox.vgrow="ALWAYS">
       <TextArea fx:id="mainChatArea" editable="false" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
@@ -68,6 +75,7 @@
           <Insets left="5.0" right="5.0" />
         </HBox.margin>
       </Button>
+
 
     </HBox>
 

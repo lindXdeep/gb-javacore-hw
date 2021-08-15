@@ -1,8 +1,11 @@
 package io.lindx.chat.client;
 
+import java.io.IOException;
+import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import io.lindx.chat.client.net.Connection;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,6 +20,8 @@ import javafx.scene.layout.VBox;
 
 public class Controller implements Initializable {
 
+  private Connection connection;
+
   @FXML
   private VBox mainChatPanel;
   @FXML
@@ -25,6 +30,14 @@ public class Controller implements Initializable {
   private TextField inputField;
   @FXML
   private Button btnSendMsg;
+  @FXML
+  private Button btnConnect;
+  @FXML
+  private Button btnDisconnect;
+
+  @FXML
+  private TextField serverAddres;
+
   @FXML
   private ListView<String> contactList;
 
@@ -55,10 +68,25 @@ public class Controller implements Initializable {
     }
   }
 
+  @FXML
+  public void connectToServer() {
+    String[] address = serverAddres.getText().split(":");
+    connection = new Connection(address[0], Integer.parseInt(address[1]));
+    connection.call();
+  }
+
+  @FXML
+  public void disconnectServer() {
+    connection.send("/End");
+    connection.shotdown();
+  }
+
   @Override
   public void initialize(URL location, ResourceBundle resources) {
 
     ObservableList<String> list = FXCollections.observableArrayList("User1", "User1", "User1", "User1", "User1");
     contactList.setItems(list);
+
+    serverAddres.setText("127.0.0.1:8181");
   }
 }

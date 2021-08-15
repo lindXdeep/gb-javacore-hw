@@ -2,40 +2,76 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-      <groupId>io.lindx</groupId>
-      <artifactId>chat</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </parent>
-    
-    <artifactId>chat_server</artifactId>
-  
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>15</maven.compiler.source>
-        <maven.compiler.target>15</maven.compiler.target>
+  <parent>
+    <groupId>io.lindx</groupId>
+    <artifactId>chat</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
 
-        <main.class>io.lindx.chat.server.App</main.class>
-    </properties>
+  <artifactId>chat_server</artifactId>
 
-    <name>server</name>
-    <url>https://github.com/lindXdeep</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>15</maven.compiler.source>
+    <maven.compiler.target>15</maven.compiler.target>
 
-    <dependencies>
-        <!-- dependencies -->
-    </dependencies>
+    <main.class>io.lindx.chat.server.App</main.class>
+  </properties>
 
-    <build>
+  <name>server</name>
+  <url>https://github.com/lindXdeep</url>
 
-        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-        <outputDirectory>${basedir}/out</outputDirectory>
-        <finalName>${project.name}</finalName>
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>exec-maven-plugin</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+  </dependencies>
 
-        <plugins>
+  <build>
 
-        </plugins>
+    <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+    <outputDirectory>${basedir}/out</outputDirectory>
+    <finalName>${project.name}</finalName>
 
-    </build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <verbose>false</verbose>
+          <executable>
+            ${JAVA_HOME}/bin/javac
+          </executable>
+        </configuration>
+      </plugin>
+
+     <plugin>
+        <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <mainClass>${main.class}</mainClass>
+              <arguments>
+                <argument>arg0</argument>
+                <argument>arg1</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+  </build>
 </project>
