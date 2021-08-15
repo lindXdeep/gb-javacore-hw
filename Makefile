@@ -1,11 +1,11 @@
-SHELL:=/bin/bash -O globstar
+SHELL:=/bin/bash -O globstar  			#You need to tell make to use bash, not sh.
 
 .DEFAULT_GOAL := compile-run
 
 compile:
-	javac -sourcepath src -d out/ src/**/*.java
+	mvn -pl chat_client compile
 
 run:
-	java -cp out/ App 
+	mvn -pl chat_client javafx:run
 
 compile-run: compile run
