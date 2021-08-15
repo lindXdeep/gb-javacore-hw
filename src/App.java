@@ -73,9 +73,12 @@ public class App {
       
       System.arraycopy(tmpRigth, 0, arr, half, half);
     });
-
+    
     th1.start();
     th2.start();
+
+    th1.join();
+    th2.join();
 
     long endTime = System.nanoTime();
 
