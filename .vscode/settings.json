@@ -1,0 +1,21 @@
+{
+  "java.configuration.updateBuildConfiguration": "automatic",
+  
+  "files.exclude": {
+    "**/.classpath": false,
+    "**/.project": false,
+    "**/.settings": false,
+    "**/.factorypath": false,
+    "**/.dccache": false,
+    "README.md": false,
+  },
+
+  
+  //если нет сборщика
+  "java.project.sourcePaths": [
+    "src/main/java"
+  ],
+
+  "workspaceCacheClean.silent": false,
+  "workspaceCacheClean.autoReload": false,
+}
