@@ -41,9 +41,35 @@ public class Connection extends Thread {
 
   @Override
   public void run() {
+    menu();
     authorize();
 
     System.out.println("ok");
+  }
+
+  private void menu() {
+    while (true) {
+      try {
+        switch (in.readLine()) {
+          case "help":
+            out.println("Available Commands:\n" + "  auth\t sign in | chat" + "  new \t Create account");
+            break;
+          case "auth":
+            authorize();
+            break;
+          case "new":
+            createAccount();
+          default:
+            out.println("Use command \"help\" for more information about a command.");
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  private void createAccount() {
+    
   }
 
   private void authorize() {
@@ -80,4 +106,5 @@ public class Connection extends Thread {
 
     out.println(user);
   }
+
 }
