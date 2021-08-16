@@ -4,15 +4,20 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Server {
 
   private boolean chprnt;
+  private static long clientId;
+  private Map<Long, Connection> connections;
 
   private final int PORT;
 
   public Server(final int port) {
     this.PORT = port;
+    connections = new HashMap<>();
   }
 
   public void start() {
@@ -23,6 +28,7 @@ public class Server {
         log("Waiting connections...");
         Socket client = serverSocket.accept();
         log("Client connected!");
+        new Connection(client, this).start();
       }
 
     } catch (IOException e) {
@@ -37,5 +43,9 @@ public class Server {
       System.out.println("\t├── " + string + "\n\t│");
     }
     chprnt = true;
+  }
+
+  protected synchronized long generateId() {
+    return clientId++;
   }
 }
