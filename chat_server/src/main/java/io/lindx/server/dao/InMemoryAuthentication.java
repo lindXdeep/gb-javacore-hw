@@ -1,4 +1,4 @@
-package io.lindx.server.security;
+package io.lindx.server.dao;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,7 +12,7 @@ import io.lindx.server.security.error.WrongCredentialsException;
 /**
  * InMemoryAuthentication
  */
-public class InMemoryAuthentication implements AuthPovider {
+public class InMemoryAuthentication implements UserDao {
 
   private Map<Integer, User> users = new HashMap<>();
 
@@ -57,5 +57,9 @@ public class InMemoryAuthentication implements AuthPovider {
       users.put(user.getId(), user);
       return true;
     }
+  }
+
+  public char[] getLastUser() {
+    return users.get(id);
   }
 }

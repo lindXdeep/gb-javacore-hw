@@ -7,17 +7,23 @@ import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.lindx.server.dao.InMemoryAuthentication;
+
 public class Server {
 
   private boolean chprnt;
-  private static long clientId;
-  private Map<Long, Connection> connections;
+
+  private Socket client;
 
   private final int PORT;
 
+  private InMemoryAuthentication inMemory;
+  private ConnectionPool connectionPool;
+
   public Server(final int port) {
     this.PORT = port;
-    connections = new HashMap<>();
+    this.inMemory = new InMemoryAuthentication();
+    this.connectionPool = new ConnectionPool();
   }
 
   public void start() {
@@ -26,7 +32,7 @@ public class Server {
 
       while (true) {
         log("Waiting connections...");
-        Socket client = serverSocket.accept();
+        client = serverSocket.accept();
         log("Client connected!");
         new Connection(client, this).start();
       }
@@ -45,7 +51,19 @@ public class Server {
     chprnt = true;
   }
 
-  protected synchronized long generateId() {
-    return clientId++;
+  public InMemoryAuthentication getAuth() {
+    return inMemory;
+  }
+
+  public ConnectionPool getConnectionPool() {
+    return connectionPool;
+  }
+
+  public void killConnection() {
+    try {
+      client.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 }

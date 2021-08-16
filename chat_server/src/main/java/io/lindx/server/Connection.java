@@ -8,25 +8,27 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import io.lindx.server.dao.InMemoryAuthentication;
 import io.lindx.server.dao.UserDao;
-import io.lindx.server.security.InMemoryAuthentication;
+import io.lindx.server.model.User;
 import io.lindx.server.security.error.UserNotFoundExeption;
 import io.lindx.server.security.error.WrongCredentialsException;
 
 public class Connection extends Thread {
+
+  private int connectId;
 
   private Server server;
   private Socket client;
   private PrintWriter out;
   private BufferedReader in;
 
-  private InMemoryAuthentication inMemory;
+  private User user;
 
   public Connection(Socket client, Server server) {
 
     this.server = server;
     this.client = client;
-    this.inMemory = new InMemoryAuthentication();
 
     try {
       out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(client.getOutputStream())), true);
@@ -40,38 +42,42 @@ public class Connection extends Thread {
   @Override
   public void run() {
     authorize();
+
+    System.out.println("ok");
   }
 
   private void authorize() {
 
-    long id = server.generateId();
-    out.println("Hello, you id: " + id);
+    out.println("Hello, anonymous!");
 
     String login = null;
     String pass = null;
 
-    while (true) {
+    try {
 
-      try {
-        out.print("Login: ");
-        out.flush();
-        login = in.readLine();
-        out.print("Password: ");
-        out.flush();
-        pass = in.readLine();
-        out.flush();
+      out.print("Login: ");
+      out.flush();
+      login = in.readLine();
+      out.print("Password: ");
+      out.flush();
+      pass = in.readLine();
+      out.flush();
 
-        out.println("---------");
+      server.log("trying from: " + client.getInetAddress());
 
-        try {
-          out.println(inMemory.getUserByLoginAndPass(login, pass));
-        } catch (WrongCredentialsException e) {
-          out.println(e.getMessage());
-        }
-       
-      } catch (IOException e) {
+      user = server.getAuth().getUserByLoginAndPass(login, pass);
 
-      }
+    } catch (WrongCredentialsException | IOException e) {
+      out.println(e.getMessage());
+      server.log("Bad credential: `" + login + "` / `" + pass + "`");
+      server.killConnection();
+      return;
     }
+
+    connectId = server.getConnectionPool().push(this);
+
+    server.log("User: id: " + user.getId() + " joined on " + connectId + "'th connection");
+
+    out.println(user);
   }
 }
