@@ -5,5 +5,6 @@
 /home/lindx/Drive-yandex-Projects/repo-default/gb-javacore/chat_server/src/main/java/io/lindx/server/security/error/WrongCredentialsException.java
 /home/lindx/Drive-yandex-Projects/repo-default/gb-javacore/chat_server/src/main/java/io/lindx/server/dao/InMemoryAuthentication.java
 /home/lindx/Drive-yandex-Projects/repo-default/gb-javacore/chat_server/src/main/java/io/lindx/server/Connection.java
+/home/lindx/Drive-yandex-Projects/repo-default/gb-javacore/chat_server/src/main/java/io/lindx/server/security/error/BadRequestException.java
 /home/lindx/Drive-yandex-Projects/repo-default/gb-javacore/chat_server/src/main/java/io/lindx/server/model/User.java
 /home/lindx/Drive-yandex-Projects/repo-default/gb-javacore/chat_server/src/main/java/io/lindx/server/dao/UserDao.java

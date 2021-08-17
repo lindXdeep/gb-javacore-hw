@@ -14,13 +14,16 @@ import io.lindx.server.security.error.WrongCredentialsException;
  */
 public class InMemoryAuthentication implements UserDao {
 
+  private static int userId = 4;
+
   private Map<Integer, User> users = new HashMap<>();
 
   {
-    users.put(1, new User(1, "User1", "pass1"));
-    users.put(2, new User(2, "User2", "pass2"));
-    users.put(3, new User(3, "User3", "pass3"));
-    users.put(4, new User(4, "User4", "pass4"));
+    users.put(0, new User(0, "admin", "admin", "Admin"));
+    users.put(1, new User(1, "user1", "pass1", "nick1"));
+    users.put(2, new User(2, "user2", "pass2", "nick2"));
+    users.put(3, new User(3, "user3", "pass3", "nick3"));
+    users.put(4, new User(4, "user4", "pass4", "nick4"));
   }
 
   @Override
@@ -49,17 +52,39 @@ public class InMemoryAuthentication implements UserDao {
   }
 
   @Override
-  public boolean addUser(final User user) {
+  public synchronized void addUser(final User user) {
 
-    if (getUserbyId(user.getId()) != null) {
-      return false;
-    } else {
-      users.put(user.getId(), user);
-      return true;
+    while (users.containsKey(++userId));
+    
+    user.setId(userId);
+    users.put(user.getId(), user);
+  }
+
+  @Override
+  public User getUserByLoginOrNick(String login, String nick) {
+
+    Iterator<Entry<Integer, User>> it = users.entrySet().iterator();
+
+    while (it.hasNext()) {
+      User user = it.next().getValue();
+      if (user.getName().equals(login) || user.getNick().equals(nick)) {
+        return user;
+      }
     }
+    throw new UserNotFoundExeption(
+        "ERROR: User not found, because login:" + login + " and " + nick + " does not exist.");
   }
 
-  public char[] getLastUser() {
-    return users.get(id);
+  public static int getCurrentId() {
+    return userId;
   }
+
+  public Iterator<User> getAll() {
+    return users.values().iterator();
+  }
+
+  public boolean isExist(User tmpUser) {
+    return users.containsValue(tmpUser);
+  }
+
 }
