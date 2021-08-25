@@ -77,17 +77,17 @@ public class Connection extends Thread {
             case "/help":
               out.print("\nAvailable Commands:\n" +
 
-                  "  /auth\t sign in \n" +
+                  "  /auth\t\t\t sign in \n" +
 
-                  "  /new \t Create account\n" +
+                  "  /new \t\t\t Create account\n" +
 
-                  "  /end \t exit\n" +
+                  "  /end \t\t\t exit\n" +
 
-                  "  /allusers \t show all users\n" +
+                  "  /allusers \t\t show all users\n" +
 
-                  "  /online \t show online users\n" +
+                  "  /online \t\t show online users\n" +
 
-                  "  /w [nick] [message] \t write private mesage for user\n     " +
+                  "  /w [nick] [message] \t write private mesage for user\n" +
 
                   "> ");
               out.flush();
@@ -109,8 +109,8 @@ public class Connection extends Thread {
                 User u = c.getValue().getUser();
                 out.println(
                     "\t" + c.getKey() + " \t " + u.getId() + "\t " + u.getName() + "\t " + u.getNick() + "\t-online");
-                out.flush();
               }
+              break;
             case "/allusers":
               Iterator<User> u = server.getAuth().getAll();
               while (u.hasNext()) {
