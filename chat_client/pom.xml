@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.lindx.chat</groupId>
+    <artifactId>chat</artifactId>
+    <version>ver-0.1</version>
+  </parent>
+
+  <artifactId>chat_client</artifactId>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>15</maven.compiler.source>
+    <maven.compiler.target>15</maven.compiler.target>
+    <main.class>io.lindx.client.App</main.class>
+  </properties>
+
+  <name>lindx-chat_client</name>
+  <url>https://github.com/lindXdeep</url>
+
+  <build>
+
+    <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+    <outputDirectory>${basedir}/out</outputDirectory>
+    <finalName>${project.name}</finalName>
+
+    <plugins>
+
+      <plugin>
+        <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <mainClass>${main.class}</mainClass>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+
+  </build>
+
+</project>
