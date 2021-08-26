@@ -18,21 +18,24 @@ public class Client {
 
   public Client(final ServerAddress serverAddress) {
     this.address = serverAddress;
-
-    try {
-      this.connection = new Connection(address, this);
-    } catch (IOException e) {
-      Log.error(e);
-    }
+    this.connection = new Connection(address);
   }
 
   public Client connect() {
 
-    Log.info("Trying to connect to " + address);
+    if (connection.connect()) {
+      
+      byte[] bbb = connection.read();
 
-    this.connection.start();
+      System.out.println(new String(bbb, 0, bbb.length));
 
-    Log.info("Connection with" + address + "established!");
+      byte[] hello = "Hello".getBytes();
+
+      connection.send(hello);
+
+    }
+
+    
 
     return this;
   }

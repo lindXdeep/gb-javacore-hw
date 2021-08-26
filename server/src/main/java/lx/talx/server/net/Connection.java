@@ -35,8 +35,7 @@ public class Connection extends Thread {
   @Override
   public void run() {
 
-    while (true) {
-
+    
       try {
 
         byte[] th = Thread.currentThread().toString().getBytes();
@@ -48,15 +47,19 @@ public class Connection extends Thread {
 
         buffer = new byte[123];
 
+        // если клиент не отправляет данные то java.net.SocketException: Connection reset
         in.read(buffer);
 
-        break;
+
+        System.out.println(new String(buffer, 0, buffer.length));
+
+       
 
       } catch (IOException e) {
         e.printStackTrace();
       }
 
-    }
+    
 
   }
 }
