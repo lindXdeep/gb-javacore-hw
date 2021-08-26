@@ -1,7 +1,5 @@
 package lx.talx.client;
 
-import java.io.IOException;
-
 import lx.talx.client.utils.Log;
 import lx.talx.client.utils.Menu;
 
@@ -12,12 +10,11 @@ public class App {
   public static void main(String... params) {
 
     try {
-      client = Menu.setConnectParam(client, params);
+      client = Menu.setConnectParam(client, params).connect();
     } catch (RuntimeException e) {
       Log.info(e.getMessage());
     }
 
-    client.connect();
 
   }
 }

@@ -2,6 +2,8 @@ package lx.talx.server.net;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
@@ -11,19 +13,21 @@ import lx.talx.server.utils.Log;
 
 public class Connection extends Thread {
 
+  private byte[] buffer;
+
   private Socket client;
   private Server server;
 
-  private BufferedInputStream in;
-  private BufferedOutputStream out;
+  private DataInputStream in;
+  private DataOutputStream out;
 
   public Connection(Socket client, Server server) throws IOException {
 
     this.client = client;
     this.server = server;
 
-    this.in = new BufferedInputStream(client.getInputStream());
-    this.out = new BufferedOutputStream(client.getOutputStream());
+    this.in = new DataInputStream(new BufferedInputStream(client.getInputStream()));
+    this.out = new DataOutputStream(new BufferedOutputStream(client.getOutputStream()));
 
     Log.info("Create I/O connection with " + client.toString());
   }
@@ -42,13 +46,17 @@ public class Connection extends Thread {
         out.write(th);
         out.flush();
 
-        in.read();
+        buffer = new byte[123];
+
+        in.read(buffer);
+
+        break;
 
       } catch (IOException e) {
         e.printStackTrace();
       }
-      
+
     }
-    
+
   }
 }
