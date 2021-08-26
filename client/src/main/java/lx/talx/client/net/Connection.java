@@ -7,10 +7,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-import lx.talx.client.Client;
-import lx.talx.client.error.CantReadBytesExeption;
-import lx.talx.client.error.CantWriteBytesExeption;
-import lx.talx.client.utils.Log;
+import lx.talx.client.error.*;
+import lx.talx.client.utils.*;
 
 public class Connection extends Thread {
 
@@ -40,7 +38,6 @@ public class Connection extends Thread {
     while (i-- > 0 & socket == null) {
 
       try {
-        Thread.sleep(1000);
         this.socket = new Socket(address.getHost(), address.getPort());
 
         connected = true;
@@ -51,10 +48,16 @@ public class Connection extends Thread {
           this.out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
         }
 
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      } catch (IOException e2) {
-        System.out.printf(" %s", ".");
+      } catch (IOException e1) {
+        
+        System.out.printf(" %s", i > 0 ? "." : ".\n\n");
+
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e2) {
+          e2.printStackTrace();
+        }
+
       }
     }
     return connected;
