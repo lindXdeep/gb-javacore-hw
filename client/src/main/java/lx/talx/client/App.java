@@ -1,4 +1,4 @@
-package io.lindx.client;
+package lx.talx.client;
 
 public class App {
   public static void main(String[] args) {

@@ -4,13 +4,13 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>io.lindx.chat</groupId>
-  <artifactId>chat</artifactId>
-  <version>ver-0.1</version>
+  <groupId>lx.talx</groupId>
+  <artifactId>talx-b</artifactId>
+  <version>v000</version>
 
   <modules>
-    <module>chat_server</module>
-    <module>chat_client</module>
+    <module>server</module>
+    <module>client</module>
   </modules>
 
   <packaging>pom</packaging>
@@ -21,6 +21,6 @@
     <maven.compiler.target>15</maven.compiler.target>
   </properties>
 
-  <name>chat</name>
-  <url>https://github.com/lindXdeep</url>
+  <name>TalX</name>
+  <url>https://github.com/lindXdeep/gb-javacore-hw/tree/hw-015</url>
 </project>

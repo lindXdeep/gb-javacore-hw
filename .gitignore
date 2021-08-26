@@ -1,5 +1,6 @@
-.vscode/
-out/
+**/.settings/
+**/.vscode/
+**/out/
+**/target/
+**/.dccache
 .project
-.dccache
-.settings/

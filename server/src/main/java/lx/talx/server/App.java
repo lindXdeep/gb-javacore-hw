@@ -1,4 +1,4 @@
-package io.lindx.server;
+package lx.talx.server;
 
 public class App {
 

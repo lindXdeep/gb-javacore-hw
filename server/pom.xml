@@ -5,32 +5,28 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>io.lindx.chat</groupId>
-    <artifactId>chat</artifactId>
-    <version>ver-0.1</version>
+    <groupId>lx.talx</groupId>
+    <artifactId>talx-b</artifactId>
+    <version>v000</version>
   </parent>
 
-  <artifactId>chat_server</artifactId>
+  <artifactId>talx-server</artifactId>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>15</maven.compiler.source>
     <maven.compiler.target>15</maven.compiler.target>
-    <main.class>io.lindx.server.App</main.class>
+
+    <main.class>lx.talx.server.App</main.class>
   </properties>
 
-  <name>lindx-chat_server</name>
-  <url>https://github.com/lindXdeep</url>
+  <name>TalX-Server</name>
+  <url>https://github.com/lindXdeep/gb-javacore-hw/tree/hw-015</url>
 
-  <build>
-
-    <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-    <outputDirectory>${basedir}/out</outputDirectory>
-    <finalName>${project.name}</finalName>
-
-    <plugins>
-
-      <plugin>
+  
+<build>
+  <plugins>
+     <plugin>
         <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -47,9 +43,6 @@
           </execution>
         </executions>
       </plugin>
-
-    </plugins>
-
-  </build>
-
+  </plugins>
+</build>
 </project>
