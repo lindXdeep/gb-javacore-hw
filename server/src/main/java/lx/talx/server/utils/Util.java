@@ -1,9 +1,11 @@
 package lx.talx.server.utils;
 
 import java.net.Socket;
-import java.util.Random;
+import java.util.Arrays;
 
 public class Util {
+
+  private static final String ver = "ver-0.1";
 
   private static StringBuilder sb;
 
@@ -37,5 +39,33 @@ public class Util {
     int max = 65535;
 
     return (int) (Math.random() * (max - min) + min);
+  }
+
+  public static String getLogo() {
+    return Arrays.toString(new String[] {
+
+      "\n\t            .                 ,         \n",
+
+      "\t   .    , _ | _. _ ._ _  _   -+- _       \n",
+
+      "\t    \\/\\/ (/,|(_.(_)[ | )(/,   | (_)    \n",
+
+      "\t                                         \n",
+
+      "\t _______ _______        _     _ _     _  \n",
+
+      "\t    |    |_____| |      |____/   \\___/  \n",
+
+      "\t    |    |     | |_____ |    \\_ _/   \\_",
+
+      " > messenger < \n\n", "\t\t\t".concat(Util.getVer()).concat("\n\n") });
+  }
+
+  public static String getInstruction() {
+    return "\n\n Use command \"/help\" for more information about a command.\n";
+  }
+
+  public static String getVer() {
+    return ver;
   }
 }

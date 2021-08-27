@@ -11,6 +11,7 @@ import lx.talx.server.Server;
 import lx.talx.server.error.CantReadBytesExeption;
 import lx.talx.server.error.CantWriteBytesExeption;
 import lx.talx.server.utils.Log;
+import lx.talx.server.utils.Util;
 
 public class Connection extends Thread {
 
@@ -43,6 +44,11 @@ public class Connection extends Thread {
   public void run() {
 
     protocol.executeKeyExchange();
+
+    protocol.sendEncrypted(Util.getLogo().getBytes());
+    protocol.sendEncrypted(Util.getInstruction().getBytes());
+
+    System.out.println(protocol.readEncrypted());
 
     int i = 0;
 
