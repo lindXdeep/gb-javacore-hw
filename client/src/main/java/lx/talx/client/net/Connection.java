@@ -30,10 +30,14 @@ public class Connection extends Thread {
   }
 
   public boolean connect() {
+    return connect(5);
+  }
+
+  public boolean connect(int seconds) {
 
     Log.info("Trying to connect to " + address);
 
-    int i = 10;
+    int i = seconds;
 
     while (i-- > 0 & socket == null) {
 
@@ -49,7 +53,7 @@ public class Connection extends Thread {
         }
 
       } catch (IOException e1) {
-        
+
         System.out.printf(" %s", i > 0 ? "." : ".\n\n");
 
         try {
@@ -67,7 +71,7 @@ public class Connection extends Thread {
     return buffer;
   }
 
-  public byte[] read() {
+  public byte[] read() throws CantReadBytesExeption {
 
     allocateBuffer();
 
@@ -79,6 +83,15 @@ public class Connection extends Thread {
     return buffer;
   }
 
+  public void send(byte[] bytes) {
+    try {
+      out.write(bytes);
+      out.flush();
+    } catch (IOException e) {
+      throw new CantWriteBytesExeption();
+    }
+  }
+
   private void allocateBuffer() {
     allocateBuffer(defBufSeze);
   }
@@ -87,12 +100,26 @@ public class Connection extends Thread {
     this.buffer = new byte[size];
   }
 
-  public void send(byte[] bytes) {
-    try {
-      out.write(bytes);
-      out.flush();
-    } catch (IOException e) {
-      throw new CantWriteBytesExeption();
+  public boolean getStatus() {
+    return this.connected;
+  }
+
+  public boolean ping() {
+    //TODO: сделать пинг сервака /online/offline
+    return false;
+  }
+
+  public void kill() {
+    if (socket != null) {
+      try {
+        socket.close();
+        connected = false;
+        socket = null;
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    } else {
+      Log.info("No connection to server");
     }
   }
 }

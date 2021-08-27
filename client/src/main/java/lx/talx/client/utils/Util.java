@@ -30,4 +30,8 @@ public class Util {
     return sb.toString();
   }
 
+  public static void printCursor() {
+    System.out.print("::> ");
+  }
+
 }

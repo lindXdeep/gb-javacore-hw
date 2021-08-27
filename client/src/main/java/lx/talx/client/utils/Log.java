@@ -59,6 +59,10 @@ public class Log {
     }
   }
 
+  public static void error(String message) {
+    System.out.println("\n".concat(message).concat("\n"));
+  }
+
   public static void info(String msg) {
     System.out.println("\n".concat(msg).concat("\n"));
   }
