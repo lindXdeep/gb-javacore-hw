@@ -1,4 +1,4 @@
-package lx.talx..error;
+package lx.talx.client.error;
 
 public class CantReadBytesExeption extends RuntimeException {
 

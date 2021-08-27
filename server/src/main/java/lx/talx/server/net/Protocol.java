@@ -14,36 +14,37 @@ public class Protocol {
 
   private Crypt crypt;
 
-  private Connection conncetion;
+  private Connection connection;
 
   private boolean encrypted;
 
   public Protocol(Connection connection) {
-    this.conncetion = connection;
+    this.connection = connection;
     this.crypt = new Crypt();
   }
 
   public void executeKeyExchange() {
 
-    Log.info("Waiting public key from client: ".concat(Util.getAddress(conncetion.getClient())));
+    Log.info("Waiting public key from client: ".concat(Util.getAddress(connection.getClient())));
 
     try {
 
-      crypt.setClientPubKey(readUncrypt(conncetion.read()));
+      byte[] buf = readUncrypt(connection.read());
+      crypt.setClientPubKey(buf);
 
     } catch (GeneralSecurityException e) {
-      Log.infoInvalidPublicKey(conncetion.getClient());
-      sendUncrypt("Access denied: public key is invalid.".concat(Util.getIp(conncetion.getClient())).getBytes());
-      conncetion.kill();
+      Log.infoInvalidPublicKey(connection.getClient());
+      sendUncrypt("Access denied: public key is invalid.".concat(Util.getIp(connection.getClient())).getBytes());
+      connection.kill();
     }
 
-    if (conncetion.getClient().isClosed())
+    if (connection.getClient().isClosed())
       return;
 
-    Log.info("Received client public key from" + Util.getAddress(conncetion.getClient()));
+    Log.info("Received client public key from" + Util.getAddress(connection.getClient()));
     
     sendUncrypt(crypt.getPubKeyEncoded());
-    Log.info("Sent server public key to client:" + Util.getAddress(conncetion.getClient()));
+    Log.info("Sent server public key to client:" + Util.getAddress(connection.getClient()));
 
     encrypted = true;
   }
@@ -56,7 +57,7 @@ public class Protocol {
     buf.put(intToByte(bytes.length)); // 4 // length
     buf.put(bytes); // 4 + all
 
-    conncetion.send(buf.array());
+    connection.send(buf.array());
   }
 
   /**
@@ -68,9 +69,8 @@ public class Protocol {
    * @return
    */
   private byte[] readUncrypt(byte[] msg) {
-    return Arrays.copyOfRange(msg, 4,
-
-        byteToInt(Arrays.copyOfRange(msg, 0, 4)));
+    int msgLength =  byteToInt(Arrays.copyOfRange(msg, 0, 4));
+    return Arrays.copyOfRange(msg, 4, msgLength + 4);
   }
 
   private int byteToInt(byte[] bytes) {

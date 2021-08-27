@@ -1,6 +1,8 @@
 package lx.talx.client;
 
+import lx.talx.client.error.ClientSocketExceprion;
 import lx.talx.client.net.Connection;
+import lx.talx.client.net.Protocol;
 import lx.talx.client.net.ServerAddress;
 import lx.talx.client.service.IMessageProcessor;
 import lx.talx.client.utils.Log;
@@ -12,6 +14,8 @@ public class Client {
   private IMessageProcessor msg;
   private byte[] buf;
 
+  private Protocol protocol;
+
   public Client() {
     this(new ServerAddress("127.0.0.1", 8181)); // default
   }
@@ -19,7 +23,8 @@ public class Client {
   public Client(final ServerAddress serverAddress) {
     this.address = serverAddress;
     this.connection = new Connection(address);
-    connection.connect();
+    this.protocol = new Protocol(connection);
+    connect();
   }
 
   public void setMessageProcessor(IMessageProcessor msgProc) {
@@ -30,8 +35,13 @@ public class Client {
 
     if (!connection.getStatus()) {
 
-      connection.connect();
-
+      if (connection.connect()) {
+        try {
+          this.protocol.executeKeyExchange();
+        } catch (ClientSocketExceprion e) {
+          e.printStackTrace();
+        }
+      }
     } else {
       Log.info("Connection to " + address + " is already open!");
     }

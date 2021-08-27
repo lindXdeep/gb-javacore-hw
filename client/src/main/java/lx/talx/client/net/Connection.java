@@ -61,9 +61,11 @@ public class Connection extends Thread {
         } catch (InterruptedException e2) {
           e2.printStackTrace();
         }
-
       }
     }
+
+   
+
     return connected;
   }
 
