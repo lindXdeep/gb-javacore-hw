@@ -1,6 +1,7 @@
 package lx.talx.server;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -13,7 +14,8 @@ import lx.talx.server.utils.Util;
  */
 public class Server extends Thread {
 
-  private final int PORT;
+  private int PORT;
+  private Socket socket;
 
   public Server(int port) {
     this.PORT = port;
@@ -21,16 +23,21 @@ public class Server extends Thread {
 
   @Override
   public void run() {
-    try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-      Log.info("Server is started!");
-      while (true) {
-        Log.info("Waiting connections...");
-        Socket socket = serverSocket.accept();
-        Log.info("Client" + Util.getAddress(socket) + "connected!");
-        new Connection(socket, this).start();
+
+    while (true) {
+      try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+        Log.info("Server is started on " + PORT + "!");
+        while (true) {
+          Log.info("Waiting connections...");
+          socket = serverSocket.accept();
+          Log.info("Client" + Util.getAddress(socket) + "connected!");
+          new Connection(socket, this).start();
+        }
+      } catch (BindException e) {
+        this.PORT = Util.getFreePort();
+      } catch (IOException e) {
+        e.printStackTrace();
       }
-    } catch (IOException e) {
-      e.printStackTrace();
     }
   }
 }

@@ -1,6 +1,7 @@
 package lx.talx.server.utils;
 
 import java.net.Socket;
+import java.util.Random;
 
 public class Util {
 
@@ -30,4 +31,11 @@ public class Util {
     return sb.toString();
   }
 
+  public static int getFreePort() {
+
+    int min = 49152;
+    int max = 65535;
+
+    return (int) (Math.random() * (max - min) + min);
+  }
 }

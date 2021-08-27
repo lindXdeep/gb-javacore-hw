@@ -47,7 +47,7 @@ public class Connection extends Thread {
 
         buffer = new byte[123];
 
-        // если клиент не отправляет данные то java.net.SocketException: Connection reset
+        //TODO: если клиент не отправляет данные то java.net.SocketException: Connection reset
         in.read(buffer);
 
 

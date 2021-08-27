@@ -1,16 +1,13 @@
 package lx.talx.client;
 
-import java.io.IOException;
-import java.net.Socket;
-
-import lx.talx.client.net.Connection;
-import lx.talx.client.net.ServerAddress;
-import lx.talx.client.utils.*;
+import lx.talx.client.net.*;
+import lx.talx.client.service.IMessageProcessor;
 
 public class Client {
 
   private ServerAddress address;
   private Connection connection;
+  private IMessageProcessor msg;
 
   public Client() {
     this(new ServerAddress("127.0.0.1", 8181)); // default
@@ -21,21 +18,28 @@ public class Client {
     this.connection = new Connection(address);
   }
 
+  public void setMessageProcessor(IMessageProcessor msgProc) {
+    this.msg = msgProc;
+  }
+
   public Client connect() {
 
     if (connection.connect()) {
-      
-      byte[] bbb = connection.read();
 
-      System.out.println(new String(bbb, 0, bbb.length));
+      byte[] bytesFromServer = connection.read();
 
-      byte[] hello = "Hello".getBytes();
-
-      connection.send(hello);
+      msg.process(new String(bytesFromServer, 0, bytesFromServer.length));
 
     }
-
     return this;
   }
+
+  public void sendMsg(String nextLine) {
+    connection.send(nextLine.getBytes());
+  }
+
+
+  
+  
 
 }
