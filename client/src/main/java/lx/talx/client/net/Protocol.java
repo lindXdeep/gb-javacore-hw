@@ -11,6 +11,7 @@ public class Protocol {
 
   private Connection connection;
   private Crypt crypt;
+  private byte[] buf;
 
   public Protocol(Connection connection) {
     this.connection = connection;
@@ -77,6 +78,33 @@ public class Protocol {
         (byte) ((i >> 8) & 0xFF),
 
         (byte) ((i >> 0) & 0xFF) };
+  }
+
+  public void sendEncrypted(final byte[] bytes) {
+
+    ByteBuffer buf = null;
+
+    byte[] encodeParamAndCipherMsg = crypt.encrypt(bytes); // 18 + all....
+
+    buf = ByteBuffer.allocate(4 + encodeParamAndCipherMsg.length); // 4 + 18 + all...
+    buf.put(intToByte(encodeParamAndCipherMsg.length - 18)); // 4 // length
+    buf.put(encodeParamAndCipherMsg); // 18 + all // param and cipher
+
+    connection.send(buf.array());
+  }
+
+  public byte[] readEncrypted() {
+
+    buf = connection.read();
+
+    int msgLength = byteToInt(Arrays.copyOfRange(buf, 0, 4)); // 0 - 3
+    byte[] encodeSpec = Arrays.copyOfRange(buf, 4, 22); // 4 - 22
+    byte[] cipherMsg = Arrays.copyOfRange(buf, 22, msgLength + 22); // 22 + msg.length + shift(22)
+
+    //TODO: удОлить
+    Log.info("recive: " + (4 + encodeSpec.length + msgLength));
+
+    return crypt.decrypt(encodeSpec, cipherMsg);
   }
 
 }

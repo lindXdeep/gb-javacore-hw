@@ -16,28 +16,41 @@ public class Client {
 
   private Protocol protocol;
 
-  public Client() {
-    this(new ServerAddress("127.0.0.1", 8181)); // default
+  public Client(IMessageProcessor msgProcessor) {
+    this(new ServerAddress("127.0.0.1", 8181), msgProcessor); // default
   }
 
-  public Client(final ServerAddress serverAddress) {
+  public Client(final ServerAddress serverAddress, IMessageProcessor msgProcessor) {
+    this.msg = msgProcessor;
     this.address = serverAddress;
     this.connection = new Connection(address);
     this.protocol = new Protocol(connection);
     connect();
   }
 
-  public void setMessageProcessor(IMessageProcessor msgProc) {
-    this.msg = msgProc;
-  }
-
+  //TODO:main point
   public void connect() {
 
     if (!connection.getStatus()) {
 
       if (connection.connect()) {
+
+
         try {
           this.protocol.executeKeyExchange();
+
+
+          byte[] b = protocol.readEncrypted();
+
+          msg.process(new String(b, 0, b.length));
+
+
+
+           protocol.sendEncrypted("hello crypted!".getBytes());
+
+
+
+        
         } catch (ClientSocketExceprion e) {
           e.printStackTrace();
         }

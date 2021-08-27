@@ -26,7 +26,7 @@ public class Server extends Thread {
 
     while (true) {
       try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-        Log.info("Server is started on " + PORT + "!");
+        Log.info("Server is started on: -> " + PORT);
         while (true) {
           Log.info("Waiting connections...");
           socket = serverSocket.accept();

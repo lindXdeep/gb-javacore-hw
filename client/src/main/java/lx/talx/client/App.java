@@ -25,8 +25,7 @@ public class App {
   public static void main(String... params) {
 
     try {
-      client = Menu.setConnectParam(client, params);
-      client.setMessageProcessor(msgProcessor);
+      client = Menu.setConnectParam(client, params, msgProcessor);
     } catch (RuntimeException e) {
       Log.info(e.getMessage());
     }
