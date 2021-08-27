@@ -5,15 +5,17 @@ import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.Socket;
 
 import lx.talx.server.Server;
+import lx.talx.server.error.CantReadBytesExeption;
+import lx.talx.server.error.CantWriteBytesExeption;
 import lx.talx.server.utils.Log;
 
 public class Connection extends Thread {
 
   private byte[] buffer;
+  private int defBufSeze = 13107200; // 100 MegaBit // 12,5 MB // default
 
   private Socket client;
   private Server server;
@@ -21,10 +23,15 @@ public class Connection extends Thread {
   private DataInputStream in;
   private DataOutputStream out;
 
+  private Protocol protocol;
+
   public Connection(Socket client, Server server) throws IOException {
+
+    this.buffer = new byte[defBufSeze];
 
     this.client = client;
     this.server = server;
+    this.protocol = new Protocol(this);
 
     this.in = new DataInputStream(new BufferedInputStream(client.getInputStream()));
     this.out = new DataOutputStream(new BufferedOutputStream(client.getOutputStream()));
@@ -35,31 +42,64 @@ public class Connection extends Thread {
   @Override
   public void run() {
 
-    
+    protocol.executeKeyExchange();
+
+    int i = 0;
+
+    while (true) {
+
       try {
-
-        byte[] th = Thread.currentThread().toString().getBytes();
-        byte[] he = "hello".getBytes();
-
-        out.write(he);
-        out.write(th);
-        out.flush();
-
-        buffer = new byte[123];
-
-        //TODO: если клиент не отправляет данные то java.net.SocketException: Connection reset
-        in.read(buffer);
-
-
-        System.out.println(new String(buffer, 0, buffer.length));
-
-       
-
-      } catch (IOException e) {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
         e.printStackTrace();
       }
 
-    
+      String msg = ("send -> " + i++);
 
+      send(msg.getBytes());
+      send(" hello ".getBytes());
+      send(Thread.currentThread().toString().getBytes());
+    
+      System.out.println(msg);
+
+    }
+
+  }
+
+  public Socket getClient() {
+    return this.client;
+  }
+
+  public byte[] read() throws CantReadBytesExeption {
+
+    allocateBuffer();
+
+    try {
+      in.read(buffer);
+    } catch (IOException e) {
+      throw new CantReadBytesExeption();
+    }
+    return buffer;
+  }
+
+  public void send(byte[] bytes) {
+    try {
+      out.write(bytes);
+      out.flush();
+    } catch (IOException e) {
+      throw new CantWriteBytesExeption();
+    }
+  }
+
+  private void allocateBuffer() {
+    allocateBuffer(defBufSeze);
+  }
+
+  public void allocateBuffer(final int size) {
+    this.buffer = new byte[size];
+  }
+
+  public void kill() {
+    System.out.println("kill");
   }
 }

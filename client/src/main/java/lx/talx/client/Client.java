@@ -11,7 +11,6 @@ public class Client {
   private Connection connection;
   private IMessageProcessor msg;
   private byte[] buf;
-  private Thread readThread;
 
   public Client() {
     this(new ServerAddress("127.0.0.1", 8181)); // default
@@ -30,7 +29,9 @@ public class Client {
   public void connect() {
 
     if (!connection.getStatus()) {
+
       connection.connect();
+
     } else {
       Log.info("Connection to " + address + " is already open!");
     }
@@ -50,24 +51,6 @@ public class Client {
     connection.connect();
   }
 
-  public void readMsg() {
-
-    readThread = new Thread(()->{
-      buf = connection.read();
-    });
-    readThread.start();
-
-  try {
-    Thread.sleep(1000);
-  } catch (InterruptedException e) {
-    // TODO Auto-generated catch block
-    e.printStackTrace();
-  }
-
-
-    msg.process(new String(buf, 0, buf.length));
-  }
-
   public void sendMsg(String nextLine) {
     connection.send(nextLine.getBytes());
   }
@@ -78,5 +61,13 @@ public class Client {
     } else {
       Log.info("disconnected");
     }
+  }
+
+  public byte[] read() {
+    return connection.read();
+  }
+
+  public void receive(final String message) {
+    msg.process(message);
   }
 }

@@ -17,9 +17,6 @@ public class Command implements ICommandProcessor {
 
     switch (command) {
 
-      case "/read":
-        client.readMsg();
-        break;
       case "/status":
         client.status();
         break;
