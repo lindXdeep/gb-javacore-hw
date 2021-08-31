@@ -42,15 +42,15 @@ public class Client {
     if (!connection.getStatus()) {
       if (connection.connect()) {
         try {
-          this.protocol.executeKeyExchange();
-
           // --------------------------------------
           // TODO: main point.
           // --------------------------------------
+          this.protocol.executeKeyExchange();
+
+          
+
+
           acc.readMeaasges(msgProcessor);
-
-
-
 
           protocol.sendEncrypted("hello crypted!".getBytes());
 

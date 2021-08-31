@@ -53,6 +53,13 @@ public class Connection extends Thread {
     int i = 0;
 
     while (true) {
+      
+      getCredential();
+
+      
+
+
+
 
       try {
         Thread.sleep(1000);
@@ -62,12 +69,23 @@ public class Connection extends Thread {
 
       String msg = ("send -> " + i++);
 
+
+
       protocol.sendEncrypted(msg.getBytes());
       protocol.sendEncrypted(" hello ".getBytes());
       protocol.sendEncrypted(Thread.currentThread().toString().getBytes());
     
       System.out.println(msg);
     }
+  }
+
+  private void getCredential() {
+
+    
+
+
+
+
   }
 
   public Socket getClient() {
