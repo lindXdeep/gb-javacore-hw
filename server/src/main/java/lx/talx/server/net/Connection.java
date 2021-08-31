@@ -62,14 +62,12 @@ public class Connection extends Thread {
 
       String msg = ("send -> " + i++);
 
-      send(msg.getBytes());
-      send(" hello ".getBytes());
-      send(Thread.currentThread().toString().getBytes());
+      protocol.sendEncrypted(msg.getBytes());
+      protocol.sendEncrypted(" hello ".getBytes());
+      protocol.sendEncrypted(Thread.currentThread().toString().getBytes());
     
       System.out.println(msg);
-
     }
-
   }
 
   public Socket getClient() {

@@ -30,19 +30,19 @@ public class Connection extends Thread {
   }
 
   public boolean connect() {
-    return connect(5);
+    return connect(address.getPort());
   }
 
-  public boolean connect(int seconds) {
+  public boolean connect(int port) {
 
     Log.info("Trying to connect to " + address);
 
-    int i = seconds;
+    int i = 5;
 
     while (i-- > 0 & socket == null) {
 
       try {
-        this.socket = new Socket(address.getHost(), address.getPort());
+        this.socket = new Socket(address.getHost(), port);
 
         connected = true;
 
@@ -63,8 +63,6 @@ public class Connection extends Thread {
         }
       }
     }
-
-   
 
     return connected;
   }
@@ -107,7 +105,7 @@ public class Connection extends Thread {
   }
 
   public boolean ping() {
-    //TODO: сделать пинг сервака /online/offline
+    // TODO: сделать пинг сервака /online/offline
     return false;
   }
 

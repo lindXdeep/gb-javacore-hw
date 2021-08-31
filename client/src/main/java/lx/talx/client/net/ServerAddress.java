@@ -2,7 +2,7 @@ package lx.talx.client.net;
 
 public class ServerAddress {
   private final String host;
-  private final int port;
+  private int port;
 
   public ServerAddress(final String host, final int port) {
     this.host = host;
@@ -20,5 +20,9 @@ public class ServerAddress {
   @Override
   public String toString() {
     return " [".concat(getHost()).concat(":").concat(String.valueOf(getPort())).concat("] ");
+  }
+
+  public void setPort(int port) {
+    this.port = port;
   }
 }

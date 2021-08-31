@@ -3,26 +3,18 @@ package lx.talx.client;
 import java.util.Scanner;
 
 import lx.talx.client.error.WrongCommandException;
-import lx.talx.client.service.ICommandProcessor;
-import lx.talx.client.service.IMessageProcessor;
-import lx.talx.client.utils.Log;
-import lx.talx.client.utils.Menu;
-import lx.talx.client.utils.Util;
+import lx.talx.client.service.MsgProcessor;
+import lx.talx.client.utils.*;
 
 public class App {
 
-  // TODO: создать нормальный класс
-  private static IMessageProcessor msgProcessor = new IMessageProcessor() {
-    @Override
-    public void process(String message) {
-      System.out.println("recive: " + message);
-    }
-  };
-
   private static Client client;
   private static Command command;
+  private static MsgProcessor msgProcessor;
 
   public static void main(String... params) {
+
+    msgProcessor = new MsgProcessor();
 
     try {
       client = Menu.setConnectParam(client, params, msgProcessor);

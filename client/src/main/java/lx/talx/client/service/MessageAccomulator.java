@@ -1,25 +1,28 @@
 package lx.talx.client.service;
 
+import java.nio.file.Files;
+
 import lx.talx.client.Client;
 
-public class MessageAccomulator extends Thread {
+public class MessageAccomulator {
 
   private Client client;
+  private Thread thread;
+  private Files file;
 
   public MessageAccomulator(Client client) {
     this.client = client;
   }
 
-  @Override
-  public void run() {
-    while (!Thread.currentThread().isInterrupted()) {
+  public void readMeaasges(IMessageProcessor messageProcessor) {
+    thread = new Thread(() -> {
+      while (!Thread.currentThread().isInterrupted()) {
 
-      byte[] b = client.read();
+        byte[] b = client.read();
 
-      client.receive(new String(b, 0, b.length));
-
-    }
-
+        messageProcessor.process(new String(b, 0, b.length));
+      }
+    });
+    thread.start();
   }
-
 }

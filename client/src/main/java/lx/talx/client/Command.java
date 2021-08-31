@@ -15,30 +15,26 @@ public class Command implements ICommandProcessor {
   @Override
   public void execute(String command) throws WrongCommandException {
 
-    switch (command) {
-
-      case "/status":
-        client.status();
-        break;
-      case "/connect":
-        client.connect();
-        break;
-      case "/disconnect":
-        client.disconnect();
-        break;
-      case "/reconnect":
-        client.reconnect();
-        break;
-      case "/exit":
-        client.disconnect();
-        System.out.println("\nbye...\n");
-        System.exit(0);
-        break;
-
-      default:
-        throw new WrongCommandException();
-
+    if (command.matches("^/status")) {
+      client.status();
+    } else if (command.matches("^/connect")) {
+      client.connect();
+    } else if (command.matches("^/connect\\s\\d{2,5}")) {
+      client.connect(Integer.parseInt(command.split("\\s")[1]));
+    } else if (command.matches("^/disconnect")) {
+      client.disconnect();
+    } else if (command.matches("^/reconnect")) {
+      client.reconnect();
+    } else if (command.matches("^/exit")) {
+      client.disconnect();
+      System.out.println("\nbye...\n");
+      System.exit(0);
+    } else if (command.matches("^/read")) {
+      client.read();
+    } else {
+      throw new WrongCommandException();
     }
+
     Util.printCursor();
   }
 }
