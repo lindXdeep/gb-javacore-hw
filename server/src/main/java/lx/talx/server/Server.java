@@ -2,6 +2,7 @@ package lx.talx.server;
 
 import java.io.IOException;
 import java.net.BindException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -39,5 +40,9 @@ public class Server extends Thread {
         e.printStackTrace();
       }
     }
+  }
+
+  public String getSocket() {
+    return socket.getInetAddress().toString();
   }
 }

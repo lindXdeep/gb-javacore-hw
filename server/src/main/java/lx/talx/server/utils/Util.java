@@ -44,21 +44,21 @@ public class Util {
   public static String getLogo() {
     return Arrays.toString(new String[] {
 
-      "\n\t            .                 ,         \n",
+        "\n\t            .                 ,         \n",
 
-      "\t   .    , _ | _. _ ._ _  _   -+- _       \n",
+        "\t   .    , _ | _. _ ._ _  _   -+- _       \n",
 
-      "\t    \\/\\/ (/,|(_.(_)[ | )(/,   | (_)    \n",
+        "\t    \\/\\/ (/,|(_.(_)[ | )(/,   | (_)    \n",
 
-      "\t                                         \n",
+        "\t                                         \n",
 
-      "\t _______ _______        _     _ _     _  \n",
+        "\t _______ _______        _     _ _     _  \n",
 
-      "\t    |    |_____| |      |____/   \\___/  \n",
+        "\t    |    |_____| |      |____/   \\___/  \n",
 
-      "\t    |    |     | |_____ |    \\_ _/   \\_",
+        "\t    |    |     | |_____ |    \\_ _/   \\_",
 
-      " > messenger < \n\n", "\t\t\t".concat(Util.getVer()).concat("\n\n") });
+        " > messenger < \n\n", "\t\t\t".concat(Util.getVer()).concat("\n\n") });
   }
 
   public static String getInstruction() {
@@ -67,5 +67,9 @@ public class Util {
 
   public static String getVer() {
     return ver;
+  }
+
+  public static String cursor(Socket socket) {
+    return "\n[".concat(socket.getInetAddress().toString().substring(1)).concat("]> ");
   }
 }

@@ -1,26 +1,30 @@
 package lx.talx.server.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class User {
+public class User implements Serializable {
   private int id;
   private String userName;
-  private String nickName;
   private String email;
   private String password;
+
+  private int authCode;
+
+  private String nickName;
 
   private static final AtomicInteger count = new AtomicInteger();
 
   public User() {
-  }
+  } 
 
-  public User(String userName, String nickName, String email, String password) {
-    this.id = count.incrementAndGet();
+  public User(String userName, String email, String password, int authCode, String nickName) {
     this.userName = userName;
-    this.nickName = nickName;
     this.email = email;
     this.password = password;
+    this.authCode = authCode;
+    this.nickName = nickName;
   }
 
   public int getId() {
@@ -63,6 +67,14 @@ public class User {
     this.password = password;
   }
 
+  private String getAuthCode() {
+    return null;
+  }
+
+  public void setAuthCode(int authCode) {
+    this.authCode = authCode;
+  }
+
   @Override
   public int hashCode() {
 
@@ -70,6 +82,7 @@ public class User {
     hash *= 17 + id;
     hash *= 17 + userName.hashCode();
     hash *= 17 + nickName.hashCode();
+    hash *= 17 + authCode;
     hash *= 17 + email.hashCode();
     hash *= 17 + password.hashCode();
 
@@ -91,19 +104,23 @@ public class User {
 
         Objects.equals(this.nickName, user.nickName) &&
 
+        Objects.equals(this.authCode, user.authCode) &&
+
         Objects.equals(this.email, user.email) &&
 
         Objects.equals(this.password, user.password);
   }
+
 
   @Override
   public String toString() {
     return "{" +
       " id='" + getId() + "'" +
       ", userName='" + getUserName() + "'" +
-      ", nickName='" + getNickName() + "'" +
       ", email='" + getEmail() + "'" +
       ", password='" + getPassword() + "'" +
+      ", authCode='" + getAuthCode() + "'" +
+      ", nickName='" + getNickName() + "'" +
       "}";
   }
 }

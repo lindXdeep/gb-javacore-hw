@@ -1,5 +1,11 @@
 package lx.talx.client;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+
 import lx.talx.client.error.ClientSocketExceprion;
 import lx.talx.client.net.Connection;
 import lx.talx.client.net.Protocol;
@@ -47,12 +53,7 @@ public class Client {
           // --------------------------------------
           this.protocol.executeKeyExchange();
 
-          
-
-
-          acc.readMeaasges(msgProcessor);
-
-          protocol.sendEncrypted("hello crypted!".getBytes());
+          auth();
 
           // --------------------------------------
           // --------------------------------------
@@ -63,6 +64,24 @@ public class Client {
       }
     } else {
       Log.info("Connection to " + address + " is already open!");
+    }
+  }
+
+  public void auth() {
+
+    if (!UserCredential.exist()) {
+
+      protocol.sendEncrypted("/auth".getBytes());
+
+      // Login/Email
+      buf = protocol.readEncrypted();
+      System.out.print(new String(buf, 0, buf.length));
+      protocol.sendEncrypted(Command.dataEnter(buf));
+
+      // Passworld
+      buf = protocol.readEncrypted();
+      System.out.print(new String(buf, 0, buf.length));
+      protocol.sendEncrypted(Command.dataEnter(buf));
     }
   }
 

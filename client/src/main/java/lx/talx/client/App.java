@@ -33,10 +33,18 @@ public class App {
 
       while (sc.hasNext()) {
 
+
+
         try {
           command.execute(sc.nextLine());
 
         } catch (WrongCommandException e) {
+
+
+
+        
+
+
           Log.error(e.getMessage());
           Util.printCursor();
         }
