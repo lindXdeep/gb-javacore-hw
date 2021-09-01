@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import lx.talx.server.auth.IUserAuthProvider;
 import lx.talx.server.net.Connection;
 import lx.talx.server.utils.Log;
 import lx.talx.server.utils.Util;
@@ -18,8 +19,11 @@ public class Server extends Thread {
   private int PORT;
   private Socket socket;
 
+  private IUserAuthProvider authProvider;
+
   public Server(int port) {
     this.PORT = port;
+    this.authProvider = new IUserAuthProvider();
   }
 
   @Override
@@ -45,4 +49,9 @@ public class Server extends Thread {
   public String getSocket() {
     return socket.getInetAddress().toString();
   }
+
+  public IUserAuthProvider getAuthProvider() {
+    return authProvider;
+  }
+
 }

@@ -3,18 +3,20 @@ package lx.talx.server.net;
 import java.net.Socket;
 import java.util.Arrays;
 
+import lx.talx.server.Server;
 import lx.talx.server.utils.Log;
 import lx.talx.server.utils.Util;
-
 
 public class RequestHandler {
 
   private Connection connection;
   private Socket client;
+  private Server server;
 
   public RequestHandler(Connection connection) {
     this.connection = connection;
     this.client = connection.getClient();
+    this.server = connection.getServer();
   }
 
   public void menu(byte[] buffer) {
@@ -29,19 +31,12 @@ public class RequestHandler {
       while (true) {
 
         connection.sendEncrypted("Login/Email: ".getBytes());
-        
-        buffer = connection.readEncrypted();
-
-        System.out.println(new String(buffer, 0, buffer.length));
+        server.getAuthProvider().setLogin(connection.readEncrypted());
 
         connection.sendEncrypted("Password: ".getBytes());
-        
-        buffer = connection.readEncrypted();
+        server.getAuthProvider().setPass(connection.readEncrypted());
 
-        System.out.println(new String(buffer, 0, buffer.length));
-
-        
-
+        connection.sendEncrypted(server.getAuthProvider().authenticate());
       }
 
     } else if (command.matches("/key")) {
