@@ -2,11 +2,12 @@ package lx.talx.server;
 
 import java.io.IOException;
 import java.net.BindException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Properties;
 
 import lx.talx.server.auth.IUserAuthProvider;
+import lx.talx.server.auth.UserAuthInMemory;
 import lx.talx.server.net.Connection;
 import lx.talx.server.utils.Log;
 import lx.talx.server.utils.Util;
@@ -21,9 +22,9 @@ public class Server extends Thread {
 
   private IUserAuthProvider authProvider;
 
-  public Server(int port) {
+  public Server(int port, Properties properties) {
     this.PORT = port;
-    this.authProvider = new IUserAuthProvider();
+    this.authProvider = new UserAuthInMemory(properties);
   }
 
   @Override
@@ -53,5 +54,4 @@ public class Server extends Thread {
   public IUserAuthProvider getAuthProvider() {
     return authProvider;
   }
-
 }

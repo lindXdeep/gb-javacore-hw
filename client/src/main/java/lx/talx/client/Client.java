@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.ByteBuffer;
+
+import org.json.simple.JSONObject;
 
 import lx.talx.client.error.ClientSocketExceprion;
 import lx.talx.client.net.Connection;
@@ -21,6 +24,7 @@ public class Client {
   private IMessageProcessor msgProcessor;
   private MessageAccomulator acc;
   private byte[] buf;
+  private JSONObject user;
 
   private Protocol protocol;
 
@@ -36,6 +40,7 @@ public class Client {
     this.address = serverAddress;
     this.connection = new Connection(address);
     this.protocol = new Protocol(connection);
+    this.user = new JSONObject();
     connect();
   }
 
@@ -82,7 +87,40 @@ public class Client {
       buf = protocol.readEncrypted();
       System.out.print(new String(buf, 0, buf.length));
       protocol.sendEncrypted(Command.dataEnter(buf));
+
+      // response to get credentials
+      if (protocol.readEncrypted().length == 0) {
+        signup();
+      }
+      // TODO Ж допилить ключ
     }
+  }
+
+  private void signup() {
+
+    System.out.println("\n--------- Sign up for Talx ---------\n");
+
+    // NickName, Username, Email, Password:
+    String[] credentionalData = { "NickName", "Username", "Email", "Password" };
+
+    for (String item : credentionalData) {
+      System.out.print(item.concat(": "));
+      user.put(item.toLowerCase(), new String(Command.dataEnter(item.concat(": ").getBytes())));
+    }
+
+    byte[] command = "/new".getBytes();
+    byte[] parameter = user.toJSONString().getBytes();
+    
+    ByteBuffer request = ByteBuffer.allocate(15 + parameter.length);
+    request.put(command);
+    request.put(15, parameter);
+
+    protocol.sendEncrypted(request.array());
+
+    //AuthCode:
+    buf = protocol.readEncrypted();
+    System.out.print(new String(buf, 0, buf.length));
+    protocol.sendEncrypted(Command.dataEnter(buf));
   }
 
   public void disconnect() {

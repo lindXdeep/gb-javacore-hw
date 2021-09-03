@@ -10,8 +10,11 @@
     <version>v000</version>
   </parent>
 
+  <groupId>lx.talx.client</groupId>
   <artifactId>talx-client</artifactId>
- 
+  <version>v000</version>
+  <packaging>jar</packaging>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>15</maven.compiler.source>
@@ -20,27 +23,8 @@
     <main.class>lx.talx.client.App</main.class>
   </properties>
 
+
   <name>TalX-Client</name>
   <url>https://github.com/lindXdeep/gb-javacore-hw/tree/hw-015</url>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.0</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <addClasspath>true</addClasspath>
-              <classpathPrefix>libs/</classpathPrefix>
-              <mainClass>
-                ${main.class}
-              </mainClass>
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

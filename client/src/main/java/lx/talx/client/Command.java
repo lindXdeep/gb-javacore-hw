@@ -3,6 +3,7 @@ package lx.talx.client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.regex.Pattern;
 
 import lx.talx.client.error.WrongCommandException;
 import lx.talx.client.service.ICommandProcessor;
@@ -16,6 +17,10 @@ public class Command implements ICommandProcessor {
   private static int minConstraint = 6;
   private static int maxConstraint = 255;
   private static BufferedReader bufIn = new BufferedReader(new InputStreamReader(System.in));
+
+  // regex pattern for email RFC822 compliant right format
+  private static Pattern ptr = Pattern.compile(
+      "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])");
 
   public Command(Client client) {
     this.client = client;
@@ -53,20 +58,39 @@ public class Command implements ICommandProcessor {
     String str = null;
 
     try {
-      while ((str = bufIn.readLine()).length() < minConstraint || str.length() > maxConstraint) {
 
-        if (str.length() < minConstraint) {
-          Log.error("String cannot be shorter than " + minConstraint + " characters");
-        } else if (str.length() > maxConstraint) {
-          Log.error("String cannot be longer than " + maxConstraint + " characters");
+      if (byteToStr(requestMessage).equals("Email:\s")) {
+
+        while (!ptr.matcher(str = bufIn.readLine()).matches()) {
+          Log.error("Invalid email format");
+          System.out.print(new String(requestMessage, 0, requestMessage.length));
         }
 
-        System.out.print(new String(requestMessage, 0, requestMessage.length));
+      } else {
+
+        while ((str = bufIn.readLine()).length() < minConstraint || str.length() > maxConstraint) {
+
+          if (str.length() < minConstraint) {
+            Log.error("String cannot be shorter than " + minConstraint + " characters");
+          } else if (str.length() > maxConstraint) {
+            Log.error("String cannot be longer than " + maxConstraint + " characters");
+          }
+
+          System.out.print(new String(requestMessage, 0, requestMessage.length));
+        }
       }
 
     } catch (IOException e) {
       System.out.println(e.getMessage());
     }
     return str.getBytes();
+  }
+
+  public static String dataEnter(String string) {
+    return null;
+  }
+
+  public static String byteToStr(byte[] b) {
+    return new String(b, 0, b.length);
   }
 }

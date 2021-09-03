@@ -5,6 +5,9 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class User implements Serializable {
+
+  private static final AtomicInteger count = new AtomicInteger();
+
   private int id;
   private String userName;
   private String email;
@@ -14,12 +17,12 @@ public class User implements Serializable {
 
   private String nickName;
 
-  private static final AtomicInteger count = new AtomicInteger();
 
   public User() {
   } 
 
   public User(String userName, String email, String password, int authCode, String nickName) {
+    this.id = count.incrementAndGet();
     this.userName = userName;
     this.email = email;
     this.password = password;
@@ -29,10 +32,6 @@ public class User implements Serializable {
 
   public int getId() {
     return this.id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
   }
 
   public String getUserName() {
@@ -104,7 +103,7 @@ public class User implements Serializable {
 
         Objects.equals(this.nickName, user.nickName) &&
 
-        Objects.equals(this.authCode, user.authCode) &&
+        this.authCode == user.authCode &&
 
         Objects.equals(this.email, user.email) &&
 
