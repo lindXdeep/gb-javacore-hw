@@ -1,6 +1,9 @@
 package lx.talx.client;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,6 +33,8 @@ public class Client {
 
   private Thread thread;
 
+  private UserCredential credential;
+
   public Client(IMessageProcessor msgProcessor) {
     this(new ServerAddress("127.0.0.1", 8181), msgProcessor); // default
   }
@@ -40,7 +45,7 @@ public class Client {
     this.address = serverAddress;
     this.connection = new Connection(address);
     this.protocol = new Protocol(connection);
-    this.user = new JSONObject();
+    this.credential = new UserCredential(this);
     connect();
   }
 
@@ -58,7 +63,11 @@ public class Client {
           // --------------------------------------
           this.protocol.executeKeyExchange();
 
-          auth();
+          if (!credential.isKeyexist()) {
+            auth();
+          } else {
+
+          }
 
           // --------------------------------------
           // --------------------------------------
@@ -74,31 +83,45 @@ public class Client {
 
   public void auth() {
 
-    if (!UserCredential.exist()) {
+    user = new JSONObject();
 
-      protocol.sendEncrypted("/auth".getBytes());
+    String[] authData = { "Login/Email", "Password" };
 
-      // Login/Email
-      buf = protocol.readEncrypted();
-      System.out.print(new String(buf, 0, buf.length));
-      protocol.sendEncrypted(Command.dataEnter(buf));
+    for (String item : authData) {
+      System.out.print(item.concat(": "));
+      user.put(item.toLowerCase(), new String(Command.dataEnter(item.concat(": ").getBytes())));
+    }
 
-      // Passworld
-      buf = protocol.readEncrypted();
-      System.out.print(new String(buf, 0, buf.length));
-      protocol.sendEncrypted(Command.dataEnter(buf));
+    byte[] command = "/auth".getBytes();
+    byte[] parameter = user.toJSONString().getBytes();
 
-      // response to get credentials
-      if (protocol.readEncrypted().length == 0) {
-        signup();
-      }
-      // TODO Ж допилить ключ
+    ByteBuffer request = ByteBuffer.allocate(15 + parameter.length);
+    request.put(command);
+    request.put(15, parameter);
+
+    protocol.sendEncrypted(request.array());
+
+    // Login/Email
+    // buf = protocol.readEncrypted();
+    // System.out.print(new String(buf, 0, buf.length));
+    // protocol.sendEncrypted(Command.dataEnter(buf));
+
+    // Passworld
+    // buf = protocol.readEncrypted();
+    // System.out.print(new String(buf, 0, buf.length));
+    // protocol.sendEncrypted(Command.dataEnter(buf));
+
+    // response to get credentials
+    if (protocol.readEncrypted().length == 0) {
+      signup();
     }
   }
 
   private void signup() {
 
     System.out.println("\n--------- Sign up for Talx ---------\n");
+
+    this.user = new JSONObject();
 
     // NickName, Username, Email, Password:
     String[] credentionalData = { "NickName", "Username", "Email", "Password" };
@@ -110,17 +133,20 @@ public class Client {
 
     byte[] command = "/new".getBytes();
     byte[] parameter = user.toJSONString().getBytes();
-    
+
     ByteBuffer request = ByteBuffer.allocate(15 + parameter.length);
     request.put(command);
     request.put(15, parameter);
 
     protocol.sendEncrypted(request.array());
 
-    //AuthCode:
+    // AuthCode:
     buf = protocol.readEncrypted();
     System.out.print(new String(buf, 0, buf.length));
     protocol.sendEncrypted(Command.dataEnter(buf));
+
+    // get auto auth key and save key on disk
+    credential.createKey(protocol.readEncrypted());
   }
 
   public void disconnect() {

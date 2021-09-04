@@ -40,15 +40,25 @@ public class RequestHandler {
     // first 15 bytes for command
     String command = new String(buffer, 0, (buffer.length < 15 ? buffer.length : 15));
 
-    if (command.matches("/auth")) {
+    if (command.startsWith("/auth")) {
 
       Log.info("Trying log in from ".concat(Util.getIp(client)));
 
-      connection.sendEncrypted("Login/Email: ".getBytes());
-      server.getAuthProvider().setLogin(connection.readEncrypted());
+      JSONObject tmpUser = null;
 
-      connection.sendEncrypted("Password: ".getBytes());
-      server.getAuthProvider().setPass(connection.readEncrypted());
+      try {
+        tmpUser = (JSONObject) new JSONParser().parse(new String(buffer, 15, buffer.length - 15));
+      } catch (ParseException e) {
+        e.printStackTrace();
+      }
+
+      System.out.println(tmpUser.toJSONString());
+
+      // connection.sendEncrypted("Login/Email: ".getBytes());
+      // server.getAuthProvider().setLogin(connection.readEncrypted());
+
+      // connection.sendEncrypted("Password: ".getBytes());
+      // server.getAuthProvider().setPass(connection.readEncrypted());
 
       connection.sendEncrypted(server.getAuthProvider().authenticate());
 
@@ -80,6 +90,7 @@ public class RequestHandler {
           for (byte b : sha1.digest(((String) tmpUser.get("password")).getBytes()))
             hPass.append(String.format("%02X", b));
 
+          //add user in database
           User user = new User();
           user.setUserName((String) tmpUser.get("username"));
           user.setEmail((String) tmpUser.get("email"));
@@ -88,6 +99,9 @@ public class RequestHandler {
           user.setPassword(hPass.toString());
 
           userService.add(user);
+
+          //send key for autologin
+          connection.sendEncrypted(user.getAuthCode().concat(user.getPassword()).getBytes());
         }
       }
     }

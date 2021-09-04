@@ -65,7 +65,7 @@ public class User implements Serializable {
     this.password = password;
   }
 
-  private String getAuthCode() {
+  public String getAuthCode() {
     return this.authCode;
   }
 
