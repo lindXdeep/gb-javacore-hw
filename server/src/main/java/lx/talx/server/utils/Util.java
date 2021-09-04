@@ -1,13 +1,26 @@
 package lx.talx.server.utils;
 
 import java.net.Socket;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.*;
 
 public class Util {
 
   private static final String ver = "ver-0.1";
-
   private static StringBuilder sb;
+  private static MessageDigest sha1;
+
+  static {
+    try {
+      sha1 = MessageDigest.getInstance("SHA-1");
+    } catch (NoSuchAlgorithmException e) {
+      e.printStackTrace();
+    }
+  }
 
   public static String getAddress(Socket socket) {
 
@@ -71,5 +84,25 @@ public class Util {
 
   public static String cursor(Socket socket) {
     return "\n[".concat(socket.getInetAddress().toString().substring(1)).concat("]> ");
+  }
+
+  public static String toHash(String str) {
+    
+    StringBuilder sbhash = new StringBuilder();
+
+    for (byte b : sha1.digest(str.getBytes()))
+      sbhash.append(String.format("%02X", b));
+    
+    return sbhash.toString();
+  }
+
+  public static JSONObject parseCredential(byte[] buffer, int index) {
+
+    try {
+      return (JSONObject) new JSONParser().parse(new String(buffer, index, buffer.length - index));
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 }

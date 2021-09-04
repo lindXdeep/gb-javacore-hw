@@ -1,16 +1,15 @@
 package lx.talx.server.net;
 
 import java.net.Socket;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import org.json.simple.JSONObject;
-import org.json.simple.parser.*;
 
 import lx.talx.server.Server;
 import lx.talx.server.model.User;
-import lx.talx.server.service.*;
-import lx.talx.server.utils.*;
+import lx.talx.server.service.UserService;
+import lx.talx.server.service.UserServiceImpl;
+import lx.talx.server.utils.Log;
+import lx.talx.server.utils.Util;
 
 public class RequestHandler {
 
@@ -19,90 +18,53 @@ public class RequestHandler {
   private Server server;
   private UserService userService;
 
-  private MessageDigest sha1;
-
   public RequestHandler(Connection connection) {
     this.connection = connection;
     this.client = connection.getClient();
     this.server = connection.getServer();
 
     this.userService = new UserServiceImpl();
-
-    try {
-      this.sha1 = MessageDigest.getInstance("SHA-1");
-    } catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
-    }
   }
 
-  public void menu(byte[] buffer) {
+  public void authorize(byte[] buffer) {
 
     // first 15 bytes for command
     String command = new String(buffer, 0, (buffer.length < 15 ? buffer.length : 15));
 
-    if (command.startsWith("/auth")) {
+    if (command.startsWith("/key")) {
 
-      Log.info("Trying log in from ".concat(Util.getIp(client)));
+      String key = new String(buffer, 15, buffer.length - 15);
 
-      JSONObject tmpUser = null;
+      User user = server.getAuthProvider().authenticate(key);
 
-      try {
-        tmpUser = (JSONObject) new JSONParser().parse(new String(buffer, 15, buffer.length - 15));
-      } catch (ParseException e) {
-        e.printStackTrace();
+      if (user != null) {
+        connection.sendEncrypted("auth ok!".getBytes());
+        Log.info("Login: " + user.getUserName() + " / " + user.getEmail());
+      } else {
+        connection.sendEncrypted(new byte[0]);
       }
 
-      System.out.println(tmpUser.toJSONString());
+    } else if (command.startsWith("/auth")) {
 
-      // connection.sendEncrypted("Login/Email: ".getBytes());
-      // server.getAuthProvider().setLogin(connection.readEncrypted());
-
-      // connection.sendEncrypted("Password: ".getBytes());
-      // server.getAuthProvider().setPass(connection.readEncrypted());
-
-      connection.sendEncrypted(server.getAuthProvider().authenticate());
+      Log.info("Trying login from ".concat(Util.getIp(client)));
+      JSONObject tmpUser = Util.parseCredential(buffer, 15);
+      connection.sendEncrypted(server.getAuthProvider().authenticate(tmpUser)); // send key or 0;
+      Log.info("Auth: " + (String) tmpUser.get("username") + " / " + (String) tmpUser.get("email"));
 
     } else if (command.startsWith("/new")) {
 
-      JSONObject tmpUser = null;
-
-      try {
-        tmpUser = (JSONObject) new JSONParser().parse(new String(buffer, 15, buffer.length - 15));
-      } catch (ParseException e) {
-        e.printStackTrace();
-      }
-
+      JSONObject tmpUser = Util.parseCredential(buffer, 15);
       char[] authcode = server.getAuthProvider().getAuthCodeAndSendToEmail(tmpUser);
-
-      String note = "We have sent Authentication code to your email: ".concat((String) tmpUser.get("email"))
-          .concat("\n\n");
+      String note = "Authentication code sent to your email: ".concat((String) tmpUser.get("email")).concat("\n\n");
       connection.sendEncrypted(note.concat("AuthCode: ").getBytes());
-
       byte[] responseAuthcode = connection.readEncrypted();
 
+      // if auth right then send [key] or [0]
       if (String.valueOf(authcode).equals(new String(responseAuthcode, 0, responseAuthcode.length))) {
-
-        if (userService.getUserByEmail((String) tmpUser.get("email")) == null
-            & userService.getUserByUserName((String) tmpUser.get("username")) == null) {
-
-          // pass to hash
-          StringBuilder hPass = new StringBuilder();
-          for (byte b : sha1.digest(((String) tmpUser.get("password")).getBytes()))
-            hPass.append(String.format("%02X", b));
-
-          //add user in database
-          User user = new User();
-          user.setUserName((String) tmpUser.get("username"));
-          user.setEmail((String) tmpUser.get("email"));
-          user.setNickName((String) tmpUser.get("nickname"));
-          user.setAuthCode(String.valueOf(authcode));
-          user.setPassword(hPass.toString());
-
-          userService.add(user);
-
-          //send key for autologin
-          connection.sendEncrypted(user.getAuthCode().concat(user.getPassword()).getBytes());
-        }
+        connection.sendEncrypted(server.getAuthProvider().create(tmpUser, authcode)); // send key for autologin
+        Log.info("New User: " + (String) tmpUser.get("username") + " / " + (String) tmpUser.get("email"));
+      } else {
+        connection.sendEncrypted(new byte[0]);
       }
     }
   }

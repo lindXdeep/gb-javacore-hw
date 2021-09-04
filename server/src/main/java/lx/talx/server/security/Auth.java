@@ -7,30 +7,22 @@ import java.util.Random;
 
 import org.json.simple.JSONObject;
 
-import lx.talx.server.dao.UserDao;
+import lx.talx.server.Server;
+import lx.talx.server.model.User;
 import lx.talx.server.net.MailService;
+import lx.talx.server.service.*;
+import lx.talx.server.utils.Util;
 
 public class Auth {
 
   private MailService mailService;
+  private UserService userService;
+  private Server server;
 
-  private byte[] login;
-  private byte[] pass;
-
-  public Auth(Properties properties) {
-    mailService = new MailService(properties);
-  }
-
-  public void setLogin(byte[] login) {
-
-  }
-
-  public void setPass(byte[] pass) {
-
-  }
-
-  public byte[] authenticate() {
-    return new byte[0];
+  public Auth(Properties properties, Server server) {
+    this.mailService = new MailService(properties);
+    this.userService = new UserServiceImpl();
+    this.server = server;
   }
 
   public char[] getAuthCodeAndSendToEmail(JSONObject tmpUser) {
@@ -71,5 +63,69 @@ public class Auth {
       rndResult ^= ((l / (long) Double.MAX_VALUE) << 4);
     }
     return rndResult;
+  }
+
+  public byte[] authenticate(final JSONObject tmpUser) {
+
+    User user = null;
+    String u = (String) tmpUser.get("username");
+
+    if ((user = userService.getUserByUserName(u)) != null || (user = userService.getUserByEmail(u)) != null) {
+      if (user.getPassword().equals(Util.toHash((String) tmpUser.get("password")))) {
+
+        // Send mail if trying authorize
+        sendMail(user.getEmail(), "Request to authorize your Talx account",
+            "We received a request to authorize your Talx account from IP: ".concat(server.getSocket()));
+
+        return user.getAuthCode().concat(user.getPassword()).getBytes();
+      }
+    }
+    return new byte[0];
+  }
+
+  private byte[] authenticate(final User user) {
+    return user.getAuthCode().concat(user.getPassword()).getBytes();
+  }
+
+  public User authenticate(final String key) {
+
+    User user = userService.getUserByKey(key);
+
+    if (user != null) {
+
+      return user;
+    }
+    return null;
+  }
+
+  public byte[] create(JSONObject tmpUser, char[] authcode) {
+
+    if (userService.getUserByEmail((String) tmpUser.get("email")) == null
+        & userService.getUserByUserName((String) tmpUser.get("username")) == null) {
+
+      // add user in database
+      User user = new User();
+      user.setUserName((String) tmpUser.get("username"));
+      user.setEmail((String) tmpUser.get("email"));
+      user.setNickName((String) tmpUser.get("nickname"));
+      user.setAuthCode(String.valueOf(authcode));
+      user.setPassword(Util.toHash((String) tmpUser.get("password")));
+
+      userService.add(user);
+
+      // Send mail if success create account
+      sendMail(user.getEmail(), "Your registration in Talx",
+          "IP: ".concat(server.getSocket() + "\n").concat("Login: ".concat(user.getUserName()) + "\n")
+              .concat("Password: ".concat((String) tmpUser.get("password")) + "\n"));
+
+      return authenticate(user);
+    }
+    return new byte[0];
+  }
+
+  private void sendMail(final String recepient, final String title, final String message) {
+    String[] msg = { title, message };
+    mailService.prepareMessage(recepient);
+    mailService.sendMsg(msg);
   }
 }

@@ -5,45 +5,38 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import javax.swing.text.html.parser.Entity;
+
 import lx.talx.server.model.User;
 
 public class UserDaoInMemory implements UserDao {
 
-  private ObjectOutputStream dbOut;
-  private ObjectInputStream dbIn;
+  Path dbusers = Paths.get("dbusers");
 
-  Map<String, User> users;
+  HashMap<String, User> users;
 
   public UserDaoInMemory() {
 
-    String db = "users.db";
-
-    if (!Files.exists(Paths.get(db), LinkOption.NOFOLLOW_LINKS)) {
-      users = new HashMap<String, User>();
-    } else {
+    if (Files.exists(dbusers, LinkOption.NOFOLLOW_LINKS)) {
       readDbInMemory();
-    }
-
-    try {
-      this.dbOut = new ObjectOutputStream(new FileOutputStream(db));
-      this.dbIn = new ObjectInputStream(new FileInputStream(db));
-    } catch (IOException e) {
-      e.printStackTrace();
+    } else {
+      users = new HashMap<String, User>();
     }
   }
 
   private void readDbInMemory() {
-    try {
+    try (ObjectInputStream dbIn = new ObjectInputStream(new FileInputStream(dbusers.toString()))) {
       users = (HashMap<String, User>) dbIn.readObject();
-    } catch (ClassNotFoundException | IOException e) {
+    } catch (IOException | ClassNotFoundException e) {
       e.printStackTrace();
     }
   }
 
   private void writeOnDisk() {
-    try {
-      this.dbOut.writeObject(users);
-      this.dbOut.flush();
+    try (ObjectOutputStream dbOut = new ObjectOutputStream(new FileOutputStream(dbusers.toString()))) {
+      dbOut.writeObject(users);
+      dbOut.flush();
+      dbOut.close();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -76,6 +69,20 @@ public class UserDaoInMemory implements UserDao {
 
       if (i.getValue().getEmail().equals(email))
         return i.getValue();
+    }
+    return null;
+  }
+
+  @Override
+  public User getUserByKey(String key) {
+
+    Iterator<Entry<String, User>> it = users.entrySet().iterator();
+
+    while (it.hasNext()) {
+      User u = it.next().getValue();
+      if (u.getAuthCode().concat(u.getPassword()).equals(key)) {
+        return u;
+      }
     }
     return null;
   }

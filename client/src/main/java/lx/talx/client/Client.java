@@ -1,13 +1,5 @@
 package lx.talx.client;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.ByteBuffer;
 
 import org.json.simple.JSONObject;
@@ -45,7 +37,7 @@ public class Client {
     this.address = serverAddress;
     this.connection = new Connection(address);
     this.protocol = new Protocol(connection);
-    this.credential = new UserCredential(this);
+    this.credential = new UserCredential();
     connect();
   }
 
@@ -63,10 +55,13 @@ public class Client {
           // --------------------------------------
           this.protocol.executeKeyExchange();
 
+          System.out.println("\nключами обменялись\n");
+
           if (!credential.isKeyexist()) {
             auth();
           } else {
-
+            System.out.println("key exist");
+            key();
           }
 
           // --------------------------------------
@@ -81,19 +76,10 @@ public class Client {
     }
   }
 
-  public void auth() {
+  private void key() {
 
-    user = new JSONObject();
-
-    String[] authData = { "Login/Email", "Password" };
-
-    for (String item : authData) {
-      System.out.print(item.concat(": "));
-      user.put(item.toLowerCase(), new String(Command.dataEnter(item.concat(": ").getBytes())));
-    }
-
-    byte[] command = "/auth".getBytes();
-    byte[] parameter = user.toJSONString().getBytes();
+    byte[] command = "/key".getBytes();
+    byte[] parameter = credential.readKey();
 
     ByteBuffer request = ByteBuffer.allocate(15 + parameter.length);
     request.put(command);
@@ -101,19 +87,23 @@ public class Client {
 
     protocol.sendEncrypted(request.array());
 
-    // Login/Email
-    // buf = protocol.readEncrypted();
-    // System.out.print(new String(buf, 0, buf.length));
-    // protocol.sendEncrypted(Command.dataEnter(buf));
+    System.out.println(protocol.readEncrypted());
+  }
 
-    // Passworld
-    // buf = protocol.readEncrypted();
-    // System.out.print(new String(buf, 0, buf.length));
-    // protocol.sendEncrypted(Command.dataEnter(buf));
+  public void auth() {
+
+    System.out.println("\n--------- Login for Talx ---------\n");
+
+    buf = prepareCredentionalData("/auth", "Username", "Password");
+    protocol.sendEncrypted(buf);
 
     // response to get credentials
-    if (protocol.readEncrypted().length == 0) {
+    buf = protocol.readEncrypted();
+
+    if (buf.length == 0) {
       signup();
+    } else {
+      credential.saveKey(buf);
     }
   }
 
@@ -121,32 +111,34 @@ public class Client {
 
     System.out.println("\n--------- Sign up for Talx ---------\n");
 
-    this.user = new JSONObject();
-
-    // NickName, Username, Email, Password:
-    String[] credentionalData = { "NickName", "Username", "Email", "Password" };
-
-    for (String item : credentionalData) {
-      System.out.print(item.concat(": "));
-      user.put(item.toLowerCase(), new String(Command.dataEnter(item.concat(": ").getBytes())));
-    }
-
-    byte[] command = "/new".getBytes();
-    byte[] parameter = user.toJSONString().getBytes();
-
-    ByteBuffer request = ByteBuffer.allocate(15 + parameter.length);
-    request.put(command);
-    request.put(15, parameter);
-
-    protocol.sendEncrypted(request.array());
+    buf = prepareCredentionalData("/new", "NickName", "Username", "Email", "Password");
+    protocol.sendEncrypted(buf);
 
     // AuthCode:
     buf = protocol.readEncrypted();
     System.out.print(new String(buf, 0, buf.length));
     protocol.sendEncrypted(Command.dataEnter(buf));
 
-    // get auto auth key and save key on disk
-    credential.createKey(protocol.readEncrypted());
+    buf = protocol.readEncrypted();
+
+    // get autoauth key and save key on disk
+    credential.saveKey(buf);
+  }
+  
+  public byte[] prepareCredentionalData(String command, String... parameters) {
+
+    this.user = new JSONObject();
+
+    for (String item : parameters) {
+      System.out.print(item.concat(": "));
+      user.put(item.toLowerCase(), new String(Command.dataEnter(item.concat(": ").getBytes())));
+    }
+
+    ByteBuffer request = ByteBuffer.allocate(15 + user.toJSONString().getBytes().length);
+    request.put(command.getBytes());
+    request.put(15, user.toJSONString().getBytes());
+
+    return request.array();
   }
 
   public void disconnect() {

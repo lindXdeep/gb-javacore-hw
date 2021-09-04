@@ -31,9 +31,13 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  public User getUserByKey(String key) {
+    return userDao.getUserByKey(key);
+  }
+  
+  @Override
   public void delete(User user) {
     // TODO Auto-generated method stub
     
   }
-    
 }

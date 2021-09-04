@@ -1,15 +1,12 @@
 package lx.talx.server;
 
 import java.io.IOException;
-import java.net.BindException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 import java.util.Properties;
 
 import lx.talx.server.net.Connection;
 import lx.talx.server.security.Auth;
-import lx.talx.server.utils.Log;
-import lx.talx.server.utils.Util;
+import lx.talx.server.utils.*;
 
 /**
  * Server
@@ -23,7 +20,7 @@ public class Server extends Thread {
 
   public Server(int port, Properties properties) {
     this.PORT = port;
-    this.authProvider = new Auth(properties);
+    this.authProvider = new Auth(properties, this);
   }
 
   @Override

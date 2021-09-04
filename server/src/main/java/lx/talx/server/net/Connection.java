@@ -1,19 +1,11 @@
 package lx.talx.server.net;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
-import java.util.Arrays;
 
 import lx.talx.server.Server;
-import lx.talx.server.dao.UserDao;
-import lx.talx.server.error.CantReadBytesExeption;
-import lx.talx.server.error.CantWriteBytesExeption;
+import lx.talx.server.error.*;
 import lx.talx.server.utils.Log;
-import lx.talx.server.utils.Util;
 
 public class Connection extends Thread {
 
@@ -61,49 +53,12 @@ public class Connection extends Thread {
 
       buffer = protocol.readEncrypted();
 
-      requestHandler.menu(buffer);
+      requestHandler.authorize(buffer);
 
-
+      System.out.println("все прошло!");
 
     }
-
-    // protocol.sendEncrypted(
-
-    // Util.getLogo().concat(
-
-    // Util.getInstruction()).concat(
-
-    // Util.cursor(server.getSocket()))
-    // .getBytes());
   }
-
- 
-
- 
-
-  // private void getCredential() {
-
-  //   Log.info("Waiting Credential from: " + client.toString());
-
-  //   buffer = protocol.readEncrypted();
-
-  //   // пока скипаем
-  //   if (buffer.length < 256) {
-
-  //   }
-
-  //   while (true) {
-
-  //     protocol.sendEncrypted("user:".getBytes());
-
-  //     byte[] b = protocol.readEncrypted();
-
-  //     System.out.println(b.length);
-  //     System.out.println(new String(b, 0, b.length));
-  //   }
-
-  // }
-
   public Socket getClient() {
     return this.client;
   }
@@ -161,16 +116,11 @@ public class Connection extends Thread {
     return server;
   }
 
-
-
   /**
    * @return Protocol return the protocol
    */
   public Protocol getProtocol() {
     return protocol;
   }
-
-
-
 
 }
