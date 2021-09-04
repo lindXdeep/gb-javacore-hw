@@ -6,9 +6,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
 
-import lx.talx.server.auth.IUserAuthProvider;
-import lx.talx.server.auth.UserAuthInMemory;
 import lx.talx.server.net.Connection;
+import lx.talx.server.security.Auth;
 import lx.talx.server.utils.Log;
 import lx.talx.server.utils.Util;
 
@@ -20,11 +19,11 @@ public class Server extends Thread {
   private int PORT;
   private Socket socket;
 
-  private IUserAuthProvider authProvider;
+  private Auth authProvider;
 
   public Server(int port, Properties properties) {
     this.PORT = port;
-    this.authProvider = new UserAuthInMemory(properties);
+    this.authProvider = new Auth(properties);
   }
 
   @Override
@@ -51,7 +50,7 @@ public class Server extends Thread {
     return socket.getInetAddress().toString();
   }
 
-  public IUserAuthProvider getAuthProvider() {
+  public Auth getAuthProvider() {
     return authProvider;
   }
 }

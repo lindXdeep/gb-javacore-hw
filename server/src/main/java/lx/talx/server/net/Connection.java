@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.Arrays;
 
 import lx.talx.server.Server;
-import lx.talx.server.auth.IUserAuthProvider;
+import lx.talx.server.dao.UserDao;
 import lx.talx.server.error.CantReadBytesExeption;
 import lx.talx.server.error.CantWriteBytesExeption;
 import lx.talx.server.utils.Log;

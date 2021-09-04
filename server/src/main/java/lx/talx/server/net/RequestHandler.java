@@ -1,25 +1,38 @@
 package lx.talx.server.net;
 
 import java.net.Socket;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.simple.parser.*;
 
 import lx.talx.server.Server;
-import lx.talx.server.utils.Log;
-import lx.talx.server.utils.Util;
+import lx.talx.server.model.User;
+import lx.talx.server.service.*;
+import lx.talx.server.utils.*;
 
 public class RequestHandler {
 
   private Connection connection;
   private Socket client;
   private Server server;
+  private UserService userService;
+
+  private MessageDigest sha1;
 
   public RequestHandler(Connection connection) {
     this.connection = connection;
     this.client = connection.getClient();
     this.server = connection.getServer();
+
+    this.userService = new UserServiceImpl();
+
+    try {
+      this.sha1 = MessageDigest.getInstance("SHA-1");
+    } catch (NoSuchAlgorithmException e) {
+      e.printStackTrace();
+    }
   }
 
   public void menu(byte[] buffer) {
@@ -51,24 +64,32 @@ public class RequestHandler {
 
       char[] authcode = server.getAuthProvider().getAuthCodeAndSendToEmail(tmpUser);
 
-      String note = "We have sent Authentication code to your email: ".concat((String) tmpUser.get("email")).concat("\n\n");
+      String note = "We have sent Authentication code to your email: ".concat((String) tmpUser.get("email"))
+          .concat("\n\n");
       connection.sendEncrypted(note.concat("AuthCode: ").getBytes());
 
-      buffer = connection.readEncrypted();
-      System.out.println(new String(buffer, 0, buffer.length));
+      byte[] responseAuthcode = connection.readEncrypted();
 
+      if (String.valueOf(authcode).equals(new String(responseAuthcode, 0, responseAuthcode.length))) {
 
+        if (userService.getUserByEmail((String) tmpUser.get("email")) == null
+            & userService.getUserByUserName((String) tmpUser.get("username")) == null) {
 
-      // connection.sendEncrypted("NickName: ".getBytes());
-      // server.getAuthProvider().setLogin(connection.readEncrypted());
+          // pass to hash
+          StringBuilder hPass = new StringBuilder();
+          for (byte b : sha1.digest(((String) tmpUser.get("password")).getBytes()))
+            hPass.append(String.format("%02X", b));
 
-      // connection.sendEncrypted("UserName: ".getBytes());
-      // server.getAuthProvider().setLogin(connection.readEncrypted());
+          User user = new User();
+          user.setUserName((String) tmpUser.get("username"));
+          user.setEmail((String) tmpUser.get("email"));
+          user.setNickName((String) tmpUser.get("nickname"));
+          user.setAuthCode(String.valueOf(authcode));
+          user.setPassword(hPass.toString());
 
-      // connection.sendEncrypted("UserName: ".getBytes());
-      // server.getAuthProvider().setLogin(connection.readEncrypted());
-
+          userService.add(user);
+        }
+      }
     }
-
   }
 }

@@ -13,15 +13,14 @@ public class User implements Serializable {
   private String email;
   private String password;
 
-  private int authCode;
+  private String authCode;
 
   private String nickName;
-
 
   public User() {
   } 
 
-  public User(String userName, String email, String password, int authCode, String nickName) {
+  public User(String userName, String email, String password, String authCode, String nickName) {
     this.id = count.incrementAndGet();
     this.userName = userName;
     this.email = email;
@@ -67,11 +66,11 @@ public class User implements Serializable {
   }
 
   private String getAuthCode() {
-    return null;
+    return this.authCode;
   }
 
-  public void setAuthCode(int authCode) {
-    this.authCode = authCode;
+  public void setAuthCode(String authcode) {
+    this.authCode = authcode;
   }
 
   @Override
@@ -81,7 +80,7 @@ public class User implements Serializable {
     hash *= 17 + id;
     hash *= 17 + userName.hashCode();
     hash *= 17 + nickName.hashCode();
-    hash *= 17 + authCode;
+    hash *= 17 + authCode.hashCode();
     hash *= 17 + email.hashCode();
     hash *= 17 + password.hashCode();
 
