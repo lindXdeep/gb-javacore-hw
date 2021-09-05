@@ -1,4 +1,4 @@
-package lx.talx.client;
+package lx.talx.client.security;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -25,7 +25,7 @@ public class UserCredential {
     try (DataInputStream dinkey = new DataInputStream(new FileInputStream("key"))) {
       return dinkey.readAllBytes();
     } catch (IOException e) {
-      System.out.println("auth key not exist. Please login\n");
+      System.out.println("Auth key not exist. Please login\n");
     }
     return null;
   }

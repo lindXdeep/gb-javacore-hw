@@ -3,8 +3,10 @@ package lx.talx.client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import lx.talx.client.core.Client;
 import lx.talx.client.error.WrongCommandException;
 import lx.talx.client.service.ICommandProcessor;
 import lx.talx.client.utils.Log;
@@ -16,6 +18,7 @@ public class Command implements ICommandProcessor {
 
   private static int minConstraint = 6;
   private static int maxConstraint = 255;
+  private Scanner cl = new Scanner(System.in);
   private static BufferedReader bufIn = new BufferedReader(new InputStreamReader(System.in));
 
   // regex pattern for email RFC822 compliant right format
@@ -24,6 +27,30 @@ public class Command implements ICommandProcessor {
 
   public Command(Client client) {
     this.client = client;
+
+    console();
+  }
+
+  private void console() {
+
+    System.out.println("------------ console mode ------------");
+
+    while (true) {
+
+      Util.printCursor();
+
+      while (cl.hasNext()) {
+
+        try {
+          
+          execute(cl.nextLine());
+
+        } catch (WrongCommandException e) {
+          Log.error(e.getMessage());
+          Util.printCursor();
+        }
+      }
+    }
   }
 
   @Override
@@ -84,10 +111,6 @@ public class Command implements ICommandProcessor {
       System.out.println(e.getMessage());
     }
     return str.getBytes();
-  }
-
-  public static String dataEnter(String string) {
-    return null;
   }
 
   public static String byteToStr(byte[] b) {

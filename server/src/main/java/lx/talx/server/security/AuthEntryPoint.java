@@ -1,29 +1,31 @@
-package lx.talx.server.net;
+package lx.talx.server.security;
 
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import org.json.simple.JSONObject;
 
 import lx.talx.server.Server;
-import lx.talx.server.model.User;
-import lx.talx.server.service.UserService;
-import lx.talx.server.service.UserServiceImpl;
+import lx.talx.server.core.CoreProcess;
+import lx.talx.server.net.Connection;
 import lx.talx.server.utils.Log;
 import lx.talx.server.utils.Util;
 
-public class RequestHandler {
+public class AuthEntryPoint {
+
+  private CoreProcess core;
 
   private Connection connection;
   private Socket client;
   private Server server;
-  private UserService userService;
 
-  public RequestHandler(Connection connection) {
+  private byte[] buf;
+
+  public AuthEntryPoint(Connection connection) {
     this.connection = connection;
     this.client = connection.getClient();
     this.server = connection.getServer();
-
-    this.userService = new UserServiceImpl();
   }
 
   public void authorize(byte[] buffer) {
@@ -35,11 +37,16 @@ public class RequestHandler {
 
       String key = new String(buffer, 15, buffer.length - 15);
 
-      User user = server.getAuthProvider().authenticate(key);
+      if (server.getAuthProvider().enable(key)) {
+        connection.sendEncrypted("/accepted".getBytes());
+        // --------------------------------------
+        // TODO: Main Entry point
+        // --------------------------------------
 
-      if (user != null) {
-        connection.sendEncrypted("auth ok!".getBytes());
-        Log.info("Login: " + user.getUserName() + " / " + user.getEmail());
+        core = new CoreProcess(this, server.getAuthProvider());
+
+        // --------------------------------------
+        // --------------------------------------
       } else {
         connection.sendEncrypted(new byte[0]);
       }
@@ -48,7 +55,7 @@ public class RequestHandler {
 
       Log.info("Trying login from ".concat(Util.getIp(client)));
       JSONObject tmpUser = Util.parseCredential(buffer, 15);
-      connection.sendEncrypted(server.getAuthProvider().authenticate(tmpUser)); // send key or 0;
+      connection.sendEncrypted(server.getAuthProvider().authenticate(tmpUser)); // send [key] or [0]
       Log.info("Auth: " + (String) tmpUser.get("username") + " / " + (String) tmpUser.get("email"));
 
     } else if (command.startsWith("/new")) {
@@ -67,5 +74,29 @@ public class RequestHandler {
         connection.sendEncrypted(new byte[0]);
       }
     }
+  }
+
+  public byte[] readSecure() {
+
+    buf = connection.readEncrypted();
+
+    int reciveKeyLength = Util.byteToInt(Arrays.copyOfRange(buf, 0, 4));
+    byte[] reciveKey = Arrays.copyOfRange(buf, 4, reciveKeyLength + 4);
+    if (server.getAuthProvider().isKeyEquals(reciveKey)) {
+      return Arrays.copyOfRange(buf, 4 + reciveKeyLength, buf.length);
+    }
+    return new byte[0];
+  }
+
+  public void sendSecure(byte[] bytes) {
+
+    byte key[] = server.getAuthProvider().getKeyIsEnabled();
+
+    ByteBuffer b = ByteBuffer.allocate(4 + key.length + bytes.length);
+    b.put(Util.intToByte(key.length)); // 4
+    b.put(4, key);
+    b.put(4 + key.length, bytes);
+    
+    connection.sendEncrypted(b.array());
   }
 }

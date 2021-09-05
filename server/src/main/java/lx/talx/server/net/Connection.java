@@ -5,6 +5,7 @@ import java.net.Socket;
 
 import lx.talx.server.Server;
 import lx.talx.server.error.*;
+import lx.talx.server.security.AuthEntryPoint;
 import lx.talx.server.utils.Log;
 
 public class Connection extends Thread {
@@ -19,7 +20,7 @@ public class Connection extends Thread {
   private DataOutputStream out;
 
   private Protocol protocol;
-  private RequestHandler requestHandler;
+  private AuthEntryPoint entryPoint;
 
   public Connection(Socket client, Server server) throws IOException {
 
@@ -28,7 +29,7 @@ public class Connection extends Thread {
     this.client = client;
     this.server = server;
     this.protocol = new Protocol(this);
-    this.requestHandler = new RequestHandler(this);
+    this.entryPoint = new AuthEntryPoint(this);
 
     this.in = new DataInputStream(new BufferedInputStream(client.getInputStream()));
     this.out = new DataOutputStream(new BufferedOutputStream(client.getOutputStream()));
@@ -49,16 +50,12 @@ public class Connection extends Thread {
 
     protocol.executeKeyExchange();
 
+    // TODO: Main entry point
     while (true) {
-
-      buffer = protocol.readEncrypted();
-
-      requestHandler.authorize(buffer);
-
-      System.out.println("все прошло!");
-
+      entryPoint.authorize(protocol.readEncrypted());
     }
   }
+
   public Socket getClient() {
     return this.client;
   }

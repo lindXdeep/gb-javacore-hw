@@ -1,6 +1,6 @@
 package lx.talx.client.utils;
 
-import lx.talx.client.Client;
+import lx.talx.client.core.Client;
 import lx.talx.client.net.ServerAddress;
 import lx.talx.client.service.IMessageProcessor;
 

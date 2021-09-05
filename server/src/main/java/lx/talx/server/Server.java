@@ -5,7 +5,7 @@ import java.net.*;
 import java.util.Properties;
 
 import lx.talx.server.net.Connection;
-import lx.talx.server.security.Auth;
+import lx.talx.server.security.AuthProcessor;
 import lx.talx.server.utils.*;
 
 /**
@@ -16,11 +16,11 @@ public class Server extends Thread {
   private int PORT;
   private Socket socket;
 
-  private Auth authProvider;
+  private AuthProcessor authProvider;
 
   public Server(int port, Properties properties) {
     this.PORT = port;
-    this.authProvider = new Auth(properties, this);
+    this.authProvider = new AuthProcessor(properties, this);
   }
 
   @Override
@@ -47,7 +47,7 @@ public class Server extends Thread {
     return socket.getInetAddress().toString();
   }
 
-  public Auth getAuthProvider() {
+  public AuthProcessor getAuthProvider() {
     return authProvider;
   }
 }

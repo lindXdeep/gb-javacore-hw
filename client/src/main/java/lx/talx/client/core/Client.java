@@ -1,18 +1,20 @@
-package lx.talx.client;
+package lx.talx.client.core;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import org.json.simple.JSONObject;
 
+import lx.talx.client.Command;
 import lx.talx.client.error.ClientSocketExceprion;
-import lx.talx.client.net.Connection;
-import lx.talx.client.net.Protocol;
-import lx.talx.client.net.ServerAddress;
-import lx.talx.client.service.IMessageProcessor;
-import lx.talx.client.service.MessageAccomulator;
-import lx.talx.client.utils.Log;
+import lx.talx.client.net.*;
+import lx.talx.client.security.UserCredential;
+import lx.talx.client.service.*;
+import lx.talx.client.utils.*;
 
 public class Client {
+
+  private byte[] key;
 
   private ServerAddress address;
   private Connection connection;
@@ -22,8 +24,6 @@ public class Client {
   private JSONObject user;
 
   private Protocol protocol;
-
-  private Thread thread;
 
   private UserCredential credential;
 
@@ -51,22 +51,18 @@ public class Client {
       if (connection.connect()) {
         try {
           // --------------------------------------
-          // TODO: main point.
+          // TODO: Connect -> KeyExchange -> Authentication -> Autorize
           // --------------------------------------
           this.protocol.executeKeyExchange();
 
-          System.out.println("\nключами обменялись\n");
-
+          // Authentication
           if (!credential.isKeyexist()) {
             auth();
           } else {
-            System.out.println("key exist");
             key();
           }
-
           // --------------------------------------
           // --------------------------------------
-
         } catch (ClientSocketExceprion e) {
           e.printStackTrace();
         }
@@ -79,15 +75,23 @@ public class Client {
   private void key() {
 
     byte[] command = "/key".getBytes();
-    byte[] parameter = credential.readKey();
+    key = credential.readKey();
 
-    ByteBuffer request = ByteBuffer.allocate(15 + parameter.length);
+    ByteBuffer request = ByteBuffer.allocate(15 + key.length);
     request.put(command);
-    request.put(15, parameter);
+    request.put(15, key);
 
     protocol.sendEncrypted(request.array());
 
-    System.out.println(protocol.readEncrypted());
+    buf = protocol.readEncrypted();
+
+    if (new String(buf, 0, buf.length).equals("/accepted")) {
+      System.out.println("------aacepted----");
+
+      // TODO: Main entry
+      UserAccount account = new UserAccount(this);
+      
+    }
   }
 
   public void auth() {
@@ -104,6 +108,7 @@ public class Client {
       signup();
     } else {
       credential.saveKey(buf);
+      key();
     }
   }
 
@@ -121,10 +126,13 @@ public class Client {
 
     buf = protocol.readEncrypted();
 
-    // get autoauth key and save key on disk
-    credential.saveKey(buf);
+    if (buf.length != 0) {
+      // get autoauth key and save key on disk
+      credential.saveKey(buf);
+      key();
+    }
   }
-  
+
   public byte[] prepareCredentionalData(String command, String... parameters) {
 
     this.user = new JSONObject();
@@ -173,5 +181,27 @@ public class Client {
 
   public void receive(final String message) {
     msgProcessor.process(message);
+  }
+
+  public byte[] readSecure() {
+
+    buf = protocol.readEncrypted();
+
+    int reciveKeyLength = Util.byteToInt(Arrays.copyOfRange(buf, 0, 4));
+    byte[] reciveKey = Arrays.copyOfRange(buf, 4, reciveKeyLength + 4);
+    if (Arrays.equals(key, reciveKey)) {
+      return Arrays.copyOfRange(buf, 4 + reciveKeyLength, buf.length);
+    }
+    return new byte[0];
+  }
+
+  public void sendSecure(byte[] bytes) {
+
+    ByteBuffer b = ByteBuffer.allocate(4 + key.length + bytes.length);
+    b.put(Util.intToByte(key.length)); // 4
+    b.put(4, key);
+    b.put(4 + key.length, bytes);
+
+    protocol.sendEncrypted(b.array());
   }
 }

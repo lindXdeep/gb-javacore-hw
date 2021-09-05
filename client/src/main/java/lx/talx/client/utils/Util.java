@@ -34,4 +34,30 @@ public class Util {
     System.out.print("::> ");
   }
 
+  public static int byteToInt(byte[] bytes) {
+    return (bytes != null || bytes.length == 4) ?
+
+        (int) ((0xFF & bytes[0]) << 24 |
+
+            (0xFF & bytes[1]) << 16 |
+
+            (0xFF & bytes[2]) << 8 |
+
+            (0xFF & bytes[3]) << 0
+
+        ) : 0x0;
+  }
+
+  public static byte[] intToByte(int i) {
+    return new byte[] {
+
+        (byte) ((i >> 24) & 0xFF),
+
+        (byte) ((i >> 16) & 0xFF),
+
+        (byte) ((i >> 8) & 0xFF),
+
+        (byte) ((i >> 0) & 0xFF) };
+  }
+
 }
