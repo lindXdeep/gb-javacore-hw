@@ -1,7 +1,6 @@
 package lx.talx.server.security;
 
 import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import org.json.simple.JSONObject;
@@ -63,7 +62,7 @@ public class AuthEntryPoint {
       JSONObject tmpUser = Util.parseCredential(buffer, 15);
       char[] authcode = server.getAuthProvider().getAuthCodeAndSendToEmail(tmpUser);
       String note = "Authentication code sent to your email: ".concat((String) tmpUser.get("email")).concat("\n\n");
-      connection.sendEncrypted(note.concat("AuthCode: ").getBytes());
+      connection.sendEncrypted(note.getBytes());
       byte[] responseAuthcode = connection.readEncrypted();
 
       // if auth right then send [key] or [0]
@@ -90,13 +89,10 @@ public class AuthEntryPoint {
 
   public void sendSecure(byte[] bytes) {
 
-    byte key[] = server.getAuthProvider().getKeyIsEnabled();
-
-    ByteBuffer b = ByteBuffer.allocate(4 + key.length + bytes.length);
-    b.put(Util.intToByte(key.length)); // 4
-    b.put(4, key);
-    b.put(4 + key.length, bytes);
-    
-    connection.sendEncrypted(b.array());
+    if (server.getAuthProvider().getKeyIsEnabled().length != 0) {
+      connection.sendEncrypted(bytes);
+    } else {
+      connection.sendEncrypted(new byte[0]);
+    }
   }
 }

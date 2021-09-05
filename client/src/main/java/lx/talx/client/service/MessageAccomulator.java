@@ -2,7 +2,7 @@ package lx.talx.client.service;
 
 import java.nio.file.Files;
 
-import lx.talx.client.core.Client;
+import lx.talx.client.api.Client;
 
 public class MessageAccomulator {
 

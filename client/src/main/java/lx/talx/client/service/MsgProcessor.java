@@ -68,7 +68,7 @@ public class MsgProcessor implements IMessageProcessor {
       return true;
     }
 
-    Log.info("No permission to write in the current program directory");
+    Log.log("No permission to write in the current program directory");
     System.exit(0);
 
     return false;

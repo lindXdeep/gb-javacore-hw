@@ -150,6 +150,5 @@ public class AuthProcessor {
 
   public byte[] getKeyIsEnabled() {
     return this.key;
-    
   }
 }

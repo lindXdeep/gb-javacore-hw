@@ -14,11 +14,19 @@ public class CoreProcess {
 
     System.out.println("--------in account--------");
 
-    byte[] b = authPoint.readSecure();
+    
+     
+      byte[] b = authPoint.readSecure();
+      
+      System.out.println(new String(b, 0, b.length));
 
-    System.out.println(new String(b, 0, b.length));
 
-    authPoint.sendSecure("zopagovno".getBytes());
+
+      authPoint.sendSecure("zopagovno".getBytes());
+
+  
+
+
 
    // authPoint.sendSecure(b);
 

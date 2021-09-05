@@ -35,7 +35,7 @@ public class Connection extends Thread {
 
   public boolean connect(int port) {
 
-    Log.info("Trying to connect to " + address);
+    Log.log("Trying to connect to " + address);
 
     int i = 5;
 
@@ -47,7 +47,7 @@ public class Connection extends Thread {
         connected = true;
 
         if (connected) {
-          Log.info("Connection with" + address + "established!");
+          Log.log("Connection with" + address + "established!");
           this.in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
           this.out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
         }
@@ -109,17 +109,17 @@ public class Connection extends Thread {
     return false;
   }
 
-  public void kill() {
+  public boolean kill() {
     if (socket != null) {
       try {
         socket.close();
         connected = false;
         socket = null;
+        return true;
       } catch (IOException e) {
         e.printStackTrace();
       }
-    } else {
-      Log.info("No connection to server");
     }
+    return false;
   }
 }

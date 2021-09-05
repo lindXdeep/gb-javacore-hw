@@ -44,11 +44,8 @@ public class Crypt {
       KeyFactory keyFactory = KeyFactory.getInstance("DH");
 
       PublicKey pubKey = keyFactory.generatePublic(new X509EncodedKeySpec(serverPubKey));
-
       keyAgree.doPhase(pubKey, true);
-
       byte[] sharedKeySecret = keyAgree.generateSecret();
-
       keyAES = new SecretKeySpec(sharedKeySecret, 0, 16, "AES");
 
     } catch (GeneralSecurityException e) {

@@ -6,7 +6,9 @@ import java.io.InputStreamReader;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-import lx.talx.client.core.Client;
+import org.json.simple.JSONObject;
+
+import lx.talx.client.api.Client;
 import lx.talx.client.error.WrongCommandException;
 import lx.talx.client.service.ICommandProcessor;
 import lx.talx.client.utils.Log;
@@ -19,6 +21,8 @@ public class Command implements ICommandProcessor {
   private static int minConstraint = 6;
   private static int maxConstraint = 255;
   private Scanner cl = new Scanner(System.in);
+
+  private byte[] buf;
   private static BufferedReader bufIn = new BufferedReader(new InputStreamReader(System.in));
 
   // regex pattern for email RFC822 compliant right format
@@ -28,6 +32,12 @@ public class Command implements ICommandProcessor {
   public Command(Client client) {
     this.client = client;
 
+    if (status()) {
+      if (!client.enterToAccount()) {
+        System.out.println("Auth key not exist. Please login\n");
+        auth();
+      }
+    }
     console();
   }
 
@@ -42,7 +52,7 @@ public class Command implements ICommandProcessor {
       while (cl.hasNext()) {
 
         try {
-          
+
           execute(cl.nextLine());
 
         } catch (WrongCommandException e) {
@@ -56,23 +66,23 @@ public class Command implements ICommandProcessor {
   @Override
   public void execute(String command) throws WrongCommandException {
     if (command.matches("^/auth")) {
-      client.auth();
+      auth();
     } else if (command.matches("^/status")) {
-      client.status();
+      status();
     } else if (command.matches("^/connect")) {
-      client.connect();
+      connect();
     } else if (command.matches("^/connect\\s\\d{2,5}")) {
-      client.connect(Integer.parseInt(command.split("\\s")[1]));
+      connect(Integer.parseInt(command.split("\\s")[1]));
     } else if (command.matches("^/disconnect")) {
-      client.disconnect();
+      disconnect();
     } else if (command.matches("^/reconnect")) {
-      client.reconnect();
+      reconnect();
+    } else if (command.matches("^/logout")) {
+      logout();
     } else if (command.matches("^/exit")) {
-      client.disconnect();
-      System.out.println("\nbye...\n");
-      System.exit(0);
+      exit();
     } else if (command.matches("^/read")) {
-      client.read();
+      read();
     } else {
       throw new WrongCommandException(command);
     }
@@ -80,13 +90,109 @@ public class Command implements ICommandProcessor {
     Util.printCursor();
   }
 
-  public static byte[] dataEnter(byte[] requestMessage) {
+  private void connect() {
+    if (client.connect()) {
+      if (!client.enterToAccount()) {
+        auth();
+      }
+    } else {
+      System.out.println("\nConnection to " + client.getAddress().getHost() + " is already open!\n");
+    }
+  }
+
+  private void connect(int port) {
+    client.connect(port);
+  }
+
+  private void reconnect() {
+
+    disconnect();
+
+    try {
+      Thread.sleep(500);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
+    connect();
+  }
+
+  private void disconnect() {
+    if (!client.disconnect()) {
+      System.out.println("\nNo connection to server\n");
+    }
+  }
+
+  private boolean status() {
+    if (client.getStatus()) {
+      System.out.println("Connected on: " + client.getAddress());
+      return true;
+    } else {
+      System.out.println("disconnected");
+      return false;
+    }
+  }
+
+  private void exit() {
+    disconnect();
+    System.out.println("\nbye...\n");
+    System.exit(0);
+  }
+
+  private void auth() {
+    System.out.println("\n--------- Login for Talx ---------\n");
+
+    if (!client.auth(prepareCredentionalData("Username", "Password"))) {
+      signup();
+    } else {
+      System.out.println("Login successful!\n");
+    }
+  }
+
+  private void signup() {
+
+    System.out.println("\n--------- Sign up for Talx ---------\n");
+
+    client.signup(prepareCredentionalData("NickName", "Username", "Email", "Password"));
+
+    // AuthCode:
+    buf = read();
+    System.out.print(Util.byteToStr(buf).concat("AuthCode: "));
+    if (client.authCode(Command.dataEnter(buf))) {
+      System.out.println("Login!");
+    } else {
+      System.out.println("Authorization code is not correct");
+    }
+  }
+
+  private void logout() {
+    client.removeKey();
+    exit();
+  }
+
+  private byte[] read() {
+    return client.read();
+  }
+
+  private JSONObject prepareCredentionalData(String... parameters) {
+
+    JSONObject user = new JSONObject();
+
+    for (String item : parameters) {
+      System.out.print(item.concat(": "));
+      user.put(item.toLowerCase(), new String(dataEnter(item.concat(": ").getBytes())));
+    }
+
+    return user;
+  }
+
+  private static byte[] dataEnter(byte[] requestMessage) {
 
     String str = null;
 
     try {
 
-      if (byteToStr(requestMessage).equals("Email:\s")) {
+      if (Util.byteToStr(requestMessage).equals("Email:\s")) {
 
         while (!ptr.matcher(str = bufIn.readLine()).matches()) {
           Log.error("Invalid email format");
@@ -113,7 +219,4 @@ public class Command implements ICommandProcessor {
     return str.getBytes();
   }
 
-  public static String byteToStr(byte[] b) {
-    return new String(b, 0, b.length);
-  }
 }

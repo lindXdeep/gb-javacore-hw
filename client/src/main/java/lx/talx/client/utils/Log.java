@@ -76,4 +76,7 @@ public class Log {
       System.out.print(s + " ");
     }
   }
+
+  public static void log(String message) {
+  }
 }

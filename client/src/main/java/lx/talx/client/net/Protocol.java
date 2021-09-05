@@ -21,14 +21,14 @@ public class Protocol {
 
   public void executeKeyExchange() throws ClientSocketExceprion {
 
-    Log.info("Generate public key");
+    Log.log("Generate public key");
     crypt.generatePublicKey();
 
-    Log.info("Sending public key to server");
+    Log.log("Sending public key to server");
     sendUncrypt(crypt.getPubKeyEncoded());
 
     crypt.setServerPubKey(readUncrypt(connection.read()));
-    Log.info("Public key from server received");
+    Log.log("Public key from server received");
   }
 
   private void sendUncrypt(byte[] bytes) {
@@ -77,9 +77,11 @@ public class Protocol {
     byte[] cipherMsg = Arrays.copyOfRange(buf, 22, msgLength + 22); // 22 + msg.length + shift(22)
 
     // TODO: удОлить
-    Log.info("recive: " + (4 + encodeSpec.length + msgLength));
+    Log.log("recive: " + (4 + encodeSpec.length + msgLength) + " b");
 
     return crypt.decrypt(encodeSpec, cipherMsg);
   }
 
 }
+
+
