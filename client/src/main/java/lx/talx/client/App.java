@@ -8,7 +8,7 @@ import lx.talx.client.utils.Menu;
 public class App {
 
   private static Connect client;
-  private static Cl commandLine;
+  private static Cli commandLine;
   private static MsgProcessor msgProcessor;
 
   public static void main(String... params) {
@@ -22,6 +22,6 @@ public class App {
     }
 
     // command line mode 
-    commandLine = new Cl(client);
+    commandLine = new Cli(client);
   }
 }

@@ -13,7 +13,6 @@ public class Connect {
 
   private ServerAddress address;
   private Connection connection;
-  private byte[] buf;
 
   private Protocol protocol;
 
