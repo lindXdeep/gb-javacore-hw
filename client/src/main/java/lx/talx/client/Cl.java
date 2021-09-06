@@ -9,18 +9,18 @@ import java.util.regex.Pattern;
 import org.json.simple.JSONObject;
 
 import lx.talx.client.api.Auth;
-import lx.talx.client.api.Client;
+import lx.talx.client.api.Connect;
 import lx.talx.client.error.WrongCommandException;
 import lx.talx.client.service.ICommandProcessor;
 import lx.talx.client.utils.Log;
 import lx.talx.client.utils.Util;
 
-public class Command implements ICommandProcessor {
+public class Cl implements ICommandProcessor {
 
-  private Client client;
+  private Connect connect;
 
-  private static int minConstraint = 6;
-  private static int maxConstraint = 255;
+  private int minConstraint = 6;
+  private int maxConstraint = 255;
   private Scanner cl = new Scanner(System.in);
 
   private byte[] buf;
@@ -32,9 +32,13 @@ public class Command implements ICommandProcessor {
   private static Pattern ptr = Pattern.compile(
       "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])");
 
-  public Command(Client client) {
-    this.client = client;
-    this.auth = client.getAuth();
+  public Cl(Connect connect) {
+    this.connect = connect;
+    this.auth = connect.getAuth();
+    console();
+  }
+
+  private void console() {
 
     if (status()) {
       if (!auth.enterToAccount()) {
@@ -42,23 +46,13 @@ public class Command implements ICommandProcessor {
         auth();
       }
     }
-    console();
-  }
-
-  private void console() {
 
     System.out.println("------------ console mode ------------");
-
     while (true) {
-
       Util.printCursor();
-
       while (cl.hasNext()) {
-
         try {
-
           execute(cl.nextLine());
-
         } catch (WrongCommandException e) {
           Log.error(e.getMessage());
           Util.printCursor();
@@ -69,24 +63,26 @@ public class Command implements ICommandProcessor {
 
   @Override
   public void execute(String command) throws WrongCommandException {
-    if (command.matches("^/auth")) {
+    if (command.matches("^/auth") || command.matches("^1")) {
       auth();
-    } else if (command.matches("^/status")) {
+    } else if (command.matches("^/status") || command.matches("^2")) {
       status();
-    } else if (command.matches("^/connect")) {
+    } else if (command.matches("^/connect") || command.matches("^3")) {
       connect();
-    } else if (command.matches("^/connect\\s\\d{2,5}")) {
+    } else if (command.matches("^/connect\\s\\d{2,5}") || command.matches("^4\\s\\d{2,5}")) {
       connect(Integer.parseInt(command.split("\\s")[1]));
-    } else if (command.matches("^/disconnect")) {
+    } else if (command.matches("^/disconnect") || command.matches("^5")) {
       disconnect();
-    } else if (command.matches("^/reconnect")) {
+    } else if (command.matches("^/reconnect") || command.matches("^6")) {
       reconnect();
-    } else if (command.matches("^/logout")) {
+    } else if (command.matches("^/logout") || command.matches("^7")) {
       logout();
-    } else if (command.matches("^/exit")) {
+    } else if (command.matches("^/exit") || command.matches("^8")) {
       exit();
-    } else if (command.matches("^/read")) {
+    } else if (command.matches("^/read") || command.matches("^9")) {
       read();
+    } else if (command.matches("^/help") || command.matches("^10")) {
+      help();
     } else {
       throw new WrongCommandException(command);
     }
@@ -95,17 +91,17 @@ public class Command implements ICommandProcessor {
   }
 
   private void connect() {
-    if (client.connect()) {
+    if (connect.connect()) {
       if (!auth.enterToAccount()) {
         auth();
       }
     } else {
-      System.out.println("\nConnection to " + client.getAddress().getHost() + " is already open!\n");
+      System.out.println("\nConnection to " + connect.getAddress().getHost() + " is already open!\n");
     }
   }
 
   private void connect(int port) {
-    client.connect(port);
+    connect.connect(port);
   }
 
   private void reconnect() {
@@ -122,14 +118,14 @@ public class Command implements ICommandProcessor {
   }
 
   private void disconnect() {
-    if (!client.disconnect()) {
+    if (!connect.disconnect()) {
       System.out.println("\nNo connection to server\n");
     }
   }
 
   private boolean status() {
-    if (client.getStatus()) {
-      System.out.println("Connected on: " + client.getAddress());
+    if (connect.getStatus()) {
+      System.out.println("Connected on: " + connect.getAddress());
       return true;
     } else {
       System.out.println("disconnected");
@@ -162,7 +158,7 @@ public class Command implements ICommandProcessor {
     // AuthCode:
     buf = read();
     System.out.print(Util.byteToStr(buf).concat("AuthCode: "));
-    if (auth.authCode(Command.dataEnter(buf))) {
+    if (auth.authCode(dataEnter(buf))) {
       System.out.println("Login!");
     } else {
       System.out.println("Authorization code is not correct");
@@ -175,7 +171,7 @@ public class Command implements ICommandProcessor {
   }
 
   private byte[] read() {
-    return client.read();
+    return connect.read();
   }
 
   private JSONObject prepareCredentionalData(String... parameters) {
@@ -190,7 +186,7 @@ public class Command implements ICommandProcessor {
     return user;
   }
 
-  private static byte[] dataEnter(byte[] requestMessage) {
+  private byte[] dataEnter(byte[] requestMessage) {
 
     String str = null;
 
@@ -223,4 +219,18 @@ public class Command implements ICommandProcessor {
     return str.getBytes();
   }
 
+  private void help() {
+
+    String[] help = { " 1. /auth               - Authentication", " 2. /status             - Сurrent status",
+        " 3. /connect            - Try connect to the server using last address:".concat(
+            connect.getAddress().toString()),
+        " 4. /connect <PORT>     - Try connect to the server using custom port",
+        " 5. /disconnect         - Disconnect from the Server", " 6. /reconnect          - Reconnect to the Server",
+        " 7. /logout             - Logout from the user account", " 8. /exit               - Exit from the Talx",
+        " 9. /recive             - Read current stream", "10. /help               - Help", };
+
+    for (String h : help) {
+      System.out.println(h);
+    }
+  }
 }

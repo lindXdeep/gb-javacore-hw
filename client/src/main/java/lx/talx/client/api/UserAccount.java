@@ -2,10 +2,10 @@ package lx.talx.client.api;
 
 public class UserAccount {
 
-  private Client client;
+  private Connect client;
   private byte[] buf;
 
-  public UserAccount(Client client) {
+  public UserAccount(Connect client) {
     this.client = client;
 
     

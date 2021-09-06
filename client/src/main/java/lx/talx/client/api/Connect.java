@@ -2,17 +2,14 @@ package lx.talx.client.api;
 
 import java.nio.ByteBuffer;
 
-import org.json.simple.JSONObject;
-
 import lx.talx.client.error.ClientSocketExceprion;
 import lx.talx.client.net.Connection;
 import lx.talx.client.net.Protocol;
 import lx.talx.client.net.ServerAddress;
-import lx.talx.client.security.UserCredential;
 import lx.talx.client.utils.Log;
 import lx.talx.client.utils.Util;
 
-public class Client {
+public class Connect {
 
   private ServerAddress address;
   private Connection connection;
@@ -22,11 +19,11 @@ public class Client {
 
   private Auth auth;
 
-  public Client() {
+  public Connect() {
     this(new ServerAddress("127.0.0.1", 8181)); // default
   }
 
-  public Client(final ServerAddress serverAddress) {
+  public Connect(final ServerAddress serverAddress) {
     this.address = serverAddress;
     this.connection = new Connection(address);
     this.protocol = new Protocol(connection);
@@ -101,5 +98,4 @@ public class Client {
   public Auth getAuth() {
     return auth;
   }
-
 }

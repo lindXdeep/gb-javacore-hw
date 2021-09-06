@@ -5,7 +5,6 @@ import java.nio.ByteBuffer;
 import org.json.simple.JSONObject;
 
 import lx.talx.client.security.UserCredential;
-
 public class Auth {
 
   private byte[] key;
@@ -16,10 +15,10 @@ public class Auth {
 
   private UserCredential credential;
 
-  private Client client;
+  private Connect connect;
 
-  public Auth(Client client) {
-    this.client = client;
+  public Auth(Connect connect) {
+    this.connect = connect;
     this.credential = new UserCredential();
   }
 
@@ -28,7 +27,7 @@ public class Auth {
     if (key()) { // if key accepted then loged to account
 
       Thread th = new Thread(() -> {
-        UserAccount account = new UserAccount(client);
+        UserAccount account = new UserAccount(connect);
       });
       th.start();
 
@@ -48,9 +47,9 @@ public class Auth {
       request.put(command);
       request.put(15, key);
 
-      client.send(request.array());
+      connect.send(request.array());
 
-      buf = client.read();
+      buf = connect.read();
 
       if (new String(buf, 0, buf.length).equals("/accepted")) {
         return true;
@@ -77,10 +76,10 @@ public class Auth {
     request.put(command);
     request.put(15, user.toJSONString().getBytes());
 
-    client.send(request.array());
+    connect.send(request.array());
 
     // response to get credentials
-    if ((buf = client.read()).length != 0) {
+    if ((buf = connect.read()).length != 0) {
       credential.saveKey(buf);
       key();
       return true;
@@ -106,14 +105,14 @@ public class Auth {
     request.put(command);
     request.put(15, user.toJSONString().getBytes());
 
-    client.send(request.array());
+    connect.send(request.array());
   }
 
   public boolean authCode(byte[] authcode) {
 
-    client.send(authcode);
+    connect.send(authcode);
 
-    if ((buf = client.read()).length != 0) {
+    if ((buf = connect.read()).length != 0) {
       credential.saveKey(buf);
       key();
       return true;

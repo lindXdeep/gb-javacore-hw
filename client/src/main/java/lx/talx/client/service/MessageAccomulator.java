@@ -2,15 +2,15 @@ package lx.talx.client.service;
 
 import java.nio.file.Files;
 
-import lx.talx.client.api.Client;
+import lx.talx.client.api.Connect;
 
 public class MessageAccomulator {
 
-  private Client client;
+  private Connect client;
   private Thread thread;
   private Files file;
 
-  public MessageAccomulator(Client client) {
+  public MessageAccomulator(Connect client) {
     this.client = client;
   }
 

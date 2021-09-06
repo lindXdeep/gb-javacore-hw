@@ -1,14 +1,14 @@
 package lx.talx.client;
 
-import lx.talx.client.api.Client;
+import lx.talx.client.api.Connect;
 import lx.talx.client.service.MsgProcessor;
 import lx.talx.client.utils.Log;
 import lx.talx.client.utils.Menu;
 
 public class App {
 
-  private static Client client;
-  private static Command command;
+  private static Connect client;
+  private static Cl commandLine;
   private static MsgProcessor msgProcessor;
 
   public static void main(String... params) {
@@ -22,6 +22,6 @@ public class App {
     }
 
     // command line mode 
-    command = new Command(client);
+    commandLine = new Cl(client);
   }
 }
