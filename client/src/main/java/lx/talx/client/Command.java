@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import org.json.simple.JSONObject;
 
+import lx.talx.client.api.Auth;
 import lx.talx.client.api.Client;
 import lx.talx.client.error.WrongCommandException;
 import lx.talx.client.service.ICommandProcessor;
@@ -23,6 +24,8 @@ public class Command implements ICommandProcessor {
   private Scanner cl = new Scanner(System.in);
 
   private byte[] buf;
+
+  private Auth auth;
   private static BufferedReader bufIn = new BufferedReader(new InputStreamReader(System.in));
 
   // regex pattern for email RFC822 compliant right format
@@ -31,9 +34,10 @@ public class Command implements ICommandProcessor {
 
   public Command(Client client) {
     this.client = client;
+    this.auth = client.getAuth();
 
     if (status()) {
-      if (!client.enterToAccount()) {
+      if (!auth.enterToAccount()) {
         System.out.println("Auth key not exist. Please login\n");
         auth();
       }
@@ -92,7 +96,7 @@ public class Command implements ICommandProcessor {
 
   private void connect() {
     if (client.connect()) {
-      if (!client.enterToAccount()) {
+      if (!auth.enterToAccount()) {
         auth();
       }
     } else {
@@ -142,7 +146,7 @@ public class Command implements ICommandProcessor {
   private void auth() {
     System.out.println("\n--------- Login for Talx ---------\n");
 
-    if (!client.auth(prepareCredentionalData("Username", "Password"))) {
+    if (!auth.auth(prepareCredentionalData("Username", "Password"))) {
       signup();
     } else {
       System.out.println("Login successful!\n");
@@ -153,12 +157,12 @@ public class Command implements ICommandProcessor {
 
     System.out.println("\n--------- Sign up for Talx ---------\n");
 
-    client.signup(prepareCredentionalData("NickName", "Username", "Email", "Password"));
+    auth.signup(prepareCredentionalData("NickName", "Username", "Email", "Password"));
 
     // AuthCode:
     buf = read();
     System.out.print(Util.byteToStr(buf).concat("AuthCode: "));
-    if (client.authCode(Command.dataEnter(buf))) {
+    if (auth.authCode(Command.dataEnter(buf))) {
       System.out.println("Login!");
     } else {
       System.out.println("Authorization code is not correct");
@@ -166,7 +170,7 @@ public class Command implements ICommandProcessor {
   }
 
   private void logout() {
-    client.removeKey();
+    auth.removeKey();
     exit();
   }
 
