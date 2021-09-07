@@ -132,4 +132,12 @@ public class Util {
 
       (byte) ((i >> 0) & 0xFF) };
   }
+
+  public static byte[] strToByte(String str) {
+    return str.getBytes();
+  }
+
+  public static String byteToStr(byte[] msg) {
+    return new String(msg, 0, msg.length);
+  }
 }

@@ -3,6 +3,7 @@ package lx.talx.server;
 import java.io.InputStream;
 import java.util.Properties;
 
+import lx.talx.server.core.Server;
 import lx.talx.server.error.WrongPortException;
 import lx.talx.server.utils.Log;
 

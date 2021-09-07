@@ -8,16 +8,15 @@ import java.util.Random;
 
 import org.json.simple.JSONObject;
 
-import lx.talx.server.Server;
+import lx.talx.server.core.Server;
 import lx.talx.server.model.User;
-import lx.talx.server.net.MailService;
 import lx.talx.server.service.*;
 import lx.talx.server.utils.Log;
 import lx.talx.server.utils.Util;
 
 public class AuthProcessor {
 
-  private byte[] key;
+  private byte[] key = new byte[0];
 
   private MailService mailService;
   private UserService userService;
@@ -27,32 +26,6 @@ public class AuthProcessor {
     this.mailService = new MailService(properties);
     this.userService = new UserServiceImpl();
     this.server = server;
-  }
-
-  public boolean enable(final String key) {
-
-    User user = null;
-
-    if ((user = userService.getUserByKey(key)) != null) {
-      Log.info("Login: " + user.getUserName() + " / " + user.getEmail());
-      this.key = key.getBytes();
-      return true;
-    }
-    return false;
-  }
-
-  public void disable() {
-    key = new byte[0];
-  }
-
-  public boolean isKeyEquals(byte[] reciveKey) {
-
-    if (Arrays.equals(reciveKey, key)) {
-      return true;
-    } else {
-      disable();
-      return false;
-    }
   }
 
   public byte[] authenticate(final JSONObject tmpUser) {
@@ -65,7 +38,7 @@ public class AuthProcessor {
 
         // Send mail if trying authorize
         sendMail(user.getEmail(), "Request to authorize your Talx account",
-            "We received a request to authorize your Talx account from IP: ".concat(server.getSocket()));
+            "We received a request to authorize your Talx account from IP: ".concat(server.getSocketAddr()));
 
         return user.getAuthCode().concat(user.getPassword()).getBytes();
       }
@@ -94,7 +67,7 @@ public class AuthProcessor {
 
       // Send mail if success create account
       sendMail(user.getEmail(), "Your registration in Talx",
-          "IP: ".concat(server.getSocket() + "\n").concat("Login: ".concat(user.getUserName()) + "\n")
+          "IP: ".concat(server.getSocketAddr() + "\n").concat("Login: ".concat(user.getUserName()) + "\n")
               .concat("Password: ".concat((String) tmpUser.get("password")) + "\n"));
 
       return authenticate(user);
@@ -148,7 +121,37 @@ public class AuthProcessor {
     mailService.sendMsg(msg);
   }
 
-  public byte[] getKeyIsEnabled() {
-    return this.key;
+  public boolean isKeyExist() {
+
+    if (key.length != 0)
+      return true;
+    else
+      return false;
+  }
+
+  public boolean isKeyEquals(byte[] reciveKey) {
+
+    if (Arrays.equals(reciveKey, key)) {
+      return true;
+    } else {
+      disable();
+      return false;
+    }
+  }
+
+  public boolean enable(final String key) {
+
+    User user = null;
+
+    if ((user = userService.getUserByKey(key)) != null) {
+      Log.info("Login: " + user.getUserName() + " / " + user.getEmail());
+      this.key = key.getBytes();
+      return true;
+    }
+    return false;
+  }
+
+  public void disable() {
+    key = new byte[0];
   }
 }

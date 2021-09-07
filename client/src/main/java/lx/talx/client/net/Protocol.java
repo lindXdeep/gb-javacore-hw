@@ -76,9 +76,6 @@ public class Protocol {
     byte[] encodeSpec = Arrays.copyOfRange(buf, 4, 22); // 4 - 22
     byte[] cipherMsg = Arrays.copyOfRange(buf, 22, msgLength + 22); // 22 + msg.length + shift(22)
 
-    // TODO: удОлить
-    Log.log("recive: " + (4 + encodeSpec.length + msgLength) + " b");
-
     return crypt.decrypt(encodeSpec, cipherMsg);
   }
 

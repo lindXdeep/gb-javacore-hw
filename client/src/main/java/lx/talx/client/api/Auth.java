@@ -4,22 +4,26 @@ import java.nio.ByteBuffer;
 
 import org.json.simple.JSONObject;
 
+import lx.talx.client.core.Account;
 import lx.talx.client.security.UserCredential;
+
 public class Auth {
 
-  private byte[] key;
-  
-  private byte[] buf;
+  private boolean loginStatus = false;
 
+  private byte[] key;
+  private byte[] buf;
   private JSONObject user;
 
   private UserCredential credential;
 
   private Connect connect;
+  private Account account;
 
   public Auth(Connect connect) {
     this.connect = connect;
     this.credential = new UserCredential();
+    Account account = new Account(connect);
   }
 
   public boolean enterToAccount() {
@@ -27,10 +31,11 @@ public class Auth {
     if (key()) { // if key accepted then loged to account
 
       Thread th = new Thread(() -> {
-        UserAccount account = new UserAccount(connect);
+        account = new Account(connect);
       });
       th.start();
 
+      loginStatus = true;
       return true;
     }
     return false;
@@ -50,7 +55,7 @@ public class Auth {
       connect.send(request.array());
 
       buf = connect.read();
-
+                                                       
       if (new String(buf, 0, buf.length).equals("/accepted")) {
         return true;
       }
@@ -128,5 +133,9 @@ public class Auth {
 
   public byte[] getKey() {
     return key;
+  }
+
+  public boolean isLoginStatus() {
+    return loginStatus;
   }
 }

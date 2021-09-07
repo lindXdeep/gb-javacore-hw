@@ -16,6 +16,8 @@ import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import lx.talx.server.utils.Log;
+
 public class Crypt {
 
   private KeyPair keyPair;
@@ -50,7 +52,7 @@ public class Crypt {
   }
 
   public byte[] encrypt(byte[] bytes) {
-    
+
     ByteBuffer buf = null;
 
     try {
@@ -86,9 +88,8 @@ public class Crypt {
       return cipher.doFinal(cipherMsg);
 
     } catch (GeneralSecurityException | IOException e) {
-      e.printStackTrace();
+      Log.error("Can't read cryptographic parameters, probably user disconected");
     }
-
     throw new RuntimeException();
   }
 }

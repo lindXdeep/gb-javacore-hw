@@ -4,6 +4,8 @@ import java.io.IOException;
 
 public class Log {
 
+  private static boolean r = false;
+
   public static void printHelp() {
 
     String[] help = {
@@ -60,11 +62,11 @@ public class Log {
   }
 
   public static void error(String message) {
-    System.out.println("\n".concat(message).concat("\n"));
+    System.out.println("\nError: ".concat(message).concat("\n"));
   }
 
   public static void info(String msg) {
-    System.out.println("\n".concat(msg).concat("\n"));
+    System.out.println("Info: ".concat(msg));
   }
 
   public static void info(String msg, IOException e) {
@@ -79,5 +81,9 @@ public class Log {
 
   public static void log(String message) {
     info(message);
+  }
+
+  public static void progress(String str) {
+    System.out.printf(str);
   }
 }

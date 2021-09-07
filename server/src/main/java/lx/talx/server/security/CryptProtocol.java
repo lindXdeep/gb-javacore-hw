@@ -1,14 +1,14 @@
-package lx.talx.server.net;
+package lx.talx.server.security;
 
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
-import lx.talx.server.security.Crypt;
+import lx.talx.server.core.Connection;
 import lx.talx.server.utils.Log;
 import lx.talx.server.utils.Util;
 
-public class Protocol {
+public class CryptProtocol {
 
   private byte[] buf;
 
@@ -18,7 +18,7 @@ public class Protocol {
 
   private boolean encrypted;
 
-  public Protocol(Connection connection) {
+  public CryptProtocol(Connection connection) {
     this.connection = connection;
     this.crypt = new Crypt();
   }
@@ -60,14 +60,6 @@ public class Protocol {
     connection.send(buf.array());
   }
 
-  /**
-   * return result message.
-   * 
-   * [length]:[byte msg]...
-   * 
-   * @param msg
-   * @return
-   */
   private byte[] readUnencrypted(byte[] msg) {
     int msgLength = Util.byteToInt(Arrays.copyOfRange(msg, 0, 4));
     return Arrays.copyOfRange(msg, 4, msgLength + 4);
@@ -86,7 +78,7 @@ public class Protocol {
     connection.send(buf.array());
   }
 
-  public byte[] readEncrypted() {
+  public byte[] readEncrypted() throws RuntimeException {
 
     buf = connection.read();
 
@@ -94,8 +86,7 @@ public class Protocol {
     byte[] encodeSpec = Arrays.copyOfRange(buf, 4, 22); // 4 - 22
     byte[] cipherMsg = Arrays.copyOfRange(buf, 22, msgLength + 22); // 22 + msg.length + shift(22)
 
-    //TODO: удОлить
-    Log.info("recive: " + (4 + encodeSpec.length + msgLength));
+    Log.readCrypt(4 + encodeSpec.length + msgLength);
 
     return crypt.decrypt(encodeSpec, cipherMsg);
   }

@@ -60,6 +60,13 @@ public class Connect {
   }
 
   // TODO: Send and recive
+  public void sendMessage(String user, String message) {
+    ByteBuffer buf = ByteBuffer.allocate(64 + 4 + message.length());
+    buf.put(0, Util.strToByte(user));
+    buf.put(64, Util.intToByte(message.length()));
+    buf.put(68, Util.strToByte(message));
+    sendSecure(buf.array());
+  }
 
   public void sendSecure(byte[] bytes) {
 
@@ -97,4 +104,5 @@ public class Connect {
   public Auth getAuth() {
     return auth;
   }
+
 }

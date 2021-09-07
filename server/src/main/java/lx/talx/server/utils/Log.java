@@ -18,4 +18,20 @@ public class Log {
   public static void infoInvalidPublicKey(Socket client) {
     Log.info("Connection from:" + Util.getAddress(client) + "rejected because public key is invalid");
   }
+
+  public static void readSec(byte[] buf) {
+    info("Read Sec-Key: " + Util.byteToStr(buf));
+  }
+
+  public static void authorize(byte[] buf) {
+    info("Read auth-buf: " + Util.byteToStr(buf));
+  }
+
+  public static void readCrypt(int l) {
+    info("Read crypt-protocol: " + l + " byte");
+  }
+
+  public static void error(String error) {
+    info(error);
+  }
 }

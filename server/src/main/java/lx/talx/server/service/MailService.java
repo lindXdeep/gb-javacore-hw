@@ -1,4 +1,4 @@
-package lx.talx.server.net;
+package lx.talx.server.service;
 
 import java.util.Properties;
 

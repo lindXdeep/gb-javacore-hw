@@ -1,10 +1,9 @@
-package lx.talx.server;
+package lx.talx.server.core;
 
 import java.io.IOException;
 import java.net.*;
 import java.util.Properties;
 
-import lx.talx.server.net.Connection;
 import lx.talx.server.security.AuthProcessor;
 import lx.talx.server.utils.*;
 
@@ -16,11 +15,13 @@ public class Server extends Thread {
   private int PORT;
   private Socket socket;
 
-  private AuthProcessor authProvider;
+  private AuthProcessor authProcessor;
+  private ConnectionPool connectionPool;
 
   public Server(int port, Properties properties) {
     this.PORT = port;
-    this.authProvider = new AuthProcessor(properties, this);
+    this.authProcessor = new AuthProcessor(properties, this);
+    this.connectionPool = new ConnectionPool();
   }
 
   @Override
@@ -43,11 +44,19 @@ public class Server extends Thread {
     }
   }
 
-  public String getSocket() {
+  public String getSocketAddr() {
     return socket.getInetAddress().toString();
   }
 
-  public AuthProcessor getAuthProvider() {
-    return authProvider;
+  public AuthProcessor getAuthProcessor() {
+    return authProcessor;
+  }
+
+  public Socket getSocket() {
+    return socket;
+  }
+
+  public ConnectionPool getConnectionPool() {
+    return connectionPool;
   }
 }

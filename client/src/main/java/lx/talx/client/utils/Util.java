@@ -63,4 +63,8 @@ public class Util {
   public static String byteToStr(byte[] b) {
     return new String(b, 0, b.length);
   }
+
+  public static byte[] strToByte(String str) {
+    return str.getBytes();
+  }
 }

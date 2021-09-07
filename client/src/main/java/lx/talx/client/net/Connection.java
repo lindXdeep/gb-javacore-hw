@@ -35,7 +35,7 @@ public class Connection extends Thread {
 
   public boolean connect(int port) {
 
-    Log.log("Trying to connect to " + address);
+    Log.log("Trying to connect to " + address + "\n");
 
     int i = 5;
 
@@ -54,7 +54,7 @@ public class Connection extends Thread {
 
       } catch (IOException e1) {
 
-        System.out.printf(" %s", i > 0 ? "." : ".\n\n");
+        Log.progress(String.format(" %s", i > 0 ? "." : ".\n\n"));
 
         try {
           Thread.sleep(1000);
@@ -102,11 +102,6 @@ public class Connection extends Thread {
 
   public boolean getStatus() {
     return this.connected;
-  }
-
-  public boolean ping() {
-    // TODO: сделать пинг сервака /online/offline
-    return false;
   }
 
   public boolean kill() {
