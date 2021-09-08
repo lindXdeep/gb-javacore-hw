@@ -11,11 +11,8 @@ public class App {
 
   private static Connect connect;
   private static ICommandLine commandLine;
-  private static IMessageProcessor msgProcessor;
 
   public static void main(String... params) {
-
-    msgProcessor = new MsgProcessor();
 
     try {
       connect = Menu.setConnectParam(connect, params);

@@ -4,7 +4,7 @@ import java.util.List;
 
 import lx.talx.server.model.User;
 
-public interface UserService {
+public interface IUserService {
   void add(User user);
 
   List<User> listUsers();

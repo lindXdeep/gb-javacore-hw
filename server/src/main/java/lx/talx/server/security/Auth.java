@@ -88,6 +88,8 @@ public class Auth {
 
   public void sendSecure(byte[] bytes) {
 
+    System.out.println("send: " + Util.byteToStr(bytes));
+
     if (server.getAuthProcessor().isKeyExist()) {
       connection.sendEncrypted(bytes);
     } else {

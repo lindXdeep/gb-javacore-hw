@@ -21,7 +21,7 @@ public class Server extends Thread {
   public Server(int port, Properties properties) {
     this.PORT = port;
     this.authProcessor = new AuthProcessor(properties, this);
-    this.connectionPool = new ConnectionPool();
+    this.connectionPool = new ConnectionPool(authProcessor);
   }
 
   @Override

@@ -2,13 +2,13 @@ package lx.talx.server.service;
 
 import java.util.List;
 
-import lx.talx.server.dao.UserDao;
+import lx.talx.server.dao.IUserDao;
 import lx.talx.server.dao.UserDaoInMemory;
 import lx.talx.server.model.User;
 
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements IUserService {
 
-  UserDao userDao = new UserDaoInMemory();
+  IUserDao userDao = new UserDaoInMemory();
 
   @Override
   public void add(User user) {
@@ -34,10 +34,10 @@ public class UserServiceImpl implements UserService {
   public User getUserByKey(String key) {
     return userDao.getUserByKey(key);
   }
-  
+
   @Override
   public void delete(User user) {
-    // TODO Auto-generated method stub
-    
+
   }
+
 }

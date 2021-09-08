@@ -8,16 +8,17 @@ public class Account {
   private Connect connect;
   private byte[] buf;
   private MessageAccomulator acc;
-  private IMessageProcessor msgProc;
+  private IMessageProcessor messageProcessor;
 
   public Account(Connect connect) {
     this.connect = connect;
     this.acc = new MessageAccomulator(connect);
-    this.msgProc = new MsgProcessor();
+    this.messageProcessor = new MsgProcessor();
 
 
-   // acc.readMeaasges(msgProc);
-   // connect.sendSecure("zopa".getBytes());
+    acc.readMeaasges(messageProcessor);
+   
+    // connect.sendSecure("zopa".getBytes());
 
 
   //  buf = connect.read();

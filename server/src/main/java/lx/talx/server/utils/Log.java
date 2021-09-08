@@ -34,4 +34,8 @@ public class Log {
   public static void error(String error) {
     info(error);
   }
+
+  public static void status(String user, String status) {
+    info("Status: " + user + " - " + status);
+  }
 }

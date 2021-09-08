@@ -5,11 +5,9 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.Map.Entry;
 
-import javax.swing.text.html.parser.Entity;
-
 import lx.talx.server.model.User;
 
-public class UserDaoInMemory implements UserDao {
+public class UserDaoInMemory implements IUserDao {
 
   Path dbusers = Paths.get("dbusers");
 

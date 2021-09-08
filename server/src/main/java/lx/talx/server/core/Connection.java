@@ -2,10 +2,13 @@ package lx.talx.server.core;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import lx.talx.server.error.*;
 import lx.talx.server.security.Auth;
 import lx.talx.server.security.CryptProtocol;
+import lx.talx.server.service.MessageService;
 import lx.talx.server.utils.Log;
 import lx.talx.server.utils.Util;
 
@@ -22,7 +25,12 @@ public class Connection extends Thread {
 
   private CryptProtocol protocol;
   private Auth auth;
-  private CoreProcess core;
+
+  private MessageService msgServ;
+
+  // regex pattern recipient user
+  private Pattern pUser = Pattern.compile("^@[a-zA-Z]{0,255}\\s");
+  private Pattern pMsg = Pattern.compile("\\s.{0,4096}");
 
   public Connection(Socket client, Server server) throws IOException {
 
@@ -32,7 +40,8 @@ public class Connection extends Thread {
     this.server = server;
     this.protocol = new CryptProtocol(this);
     this.auth = new Auth(this);
-    // this.core = new CoreProcess(auth);
+
+    this.msgServ = new MessageService(server);
 
     this.in = new DataInputStream(new BufferedInputStream(client.getInputStream()));
     this.out = new DataOutputStream(new BufferedOutputStream(client.getOutputStream()));
@@ -53,52 +62,45 @@ public class Connection extends Thread {
       server.getConnectionPool().add(this);
     }
 
+    // new Thread(() -> {
+    // try {
+    // Thread.sleep(5000);
+    // } catch (InterruptedException e) {
+    // e.printStackTrace();
+    // }
+
+    // kill();
+    // }).start();
+
     try {
 
-      while (true) {
+      String msg = null;
 
-        System.out.println(">>> " + auth.isRevoke());
+      while (auth.isRevoke() && (buffer = auth.readSecure()).length != 0) {
 
-        buffer = auth.readSecure();
+        if ((msg = Util.byteToStr(buffer)).matches("^@[a-zA-Z]{3,64}\\s.{0,4096}")) {
+
+          Matcher m;
+          String sender = server.getAuthProcessor().getCurrentUserName();
+          String recipent = null;
+          String message = null;
+
+          if ((m = pUser.matcher(msg)).find())
+            recipent = msg.substring(m.start(), m.end());
+
+          if ((m = pMsg.matcher(msg)).find())
+            message = msg.substring(m.start(), m.end()).trim();
+
+          msgServ.processMessage(sender, recipent, message);
+
+        }
 
         System.out.print(":::" + Util.byteToStr(buffer));
-
       }
 
     } catch (RuntimeException e) {
-      System.out.println("clietnt off");
-      kill();
+      System.out.println("самоубился");
     }
-
-    // System.out.println(auth.isRevoke());
-
-    /*
-     * new Thread(() -> {
-     * 
-     * try { sleep(5000); } catch (InterruptedException e) {
-     * 
-     * }
-     * 
-     * System.out.println("dis");
-     * 
-     * // client.close(); auth.revoke();
-     * 
-     * try { client.close(); } catch (IOException e) { e.printStackTrace(); }
-     * 
-     * }).start();
-     */
-
-    // while (true) {
-
-    // System.out.println("---------");
-
-    // System.out.println(auth.isRevoke());
-
-    // buffer = auth.readSecure();
-
-    // System.out.println(":::" + Util.byteToStr(buffer));
-
-    // }
 
   }
 
@@ -143,6 +145,9 @@ public class Connection extends Thread {
 
   public void kill() {
     try {
+      String user = server.getAuthProcessor().getCurrentUserName();
+      server.getConnectionPool().delete(user);
+      server.getConnectionPool().broadcast("", "/status" + user + "offline");
       client.close();
     } catch (IOException e) {
       e.printStackTrace();
@@ -167,5 +172,9 @@ public class Connection extends Thread {
 
   public Server getServer() {
     return server;
+  }
+
+  public void sendSecure(byte[] bytes) {
+    auth.sendSecure(bytes);
   }
 }

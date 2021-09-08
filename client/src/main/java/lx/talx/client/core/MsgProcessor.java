@@ -33,28 +33,31 @@ public class MsgProcessor implements IMessageProcessor {
   @Override
   public void process(final byte[] recive) {
 
-    System.out.println("+++++++++++");
-
-    byte[][] msg = parseMessage(recive);
-
-    System.out.println(Util.byteToStr(msg[0]));
-    System.out.println(Util.byteToStr(msg[1]));
-    System.out.println(Util.byteToStr(msg[2]));
-    System.out.println(Util.byteToStr(msg[3]));
+    System.out.println(Util.byteToStr(recive));
 
 
-    if (Util.byteToStr(msg[2]).equals("/user")) {
+    // System.out.println("+++++++++++");
 
-      Path user = Paths.get(db_root.toString() + sptr + msg[2]);
+    // byte[][] msg = parseMessage(recive);
+
+    // System.out.println(Util.byteToStr(msg[0]));
+    // System.out.println(Util.byteToStr(msg[1]));
+    // System.out.println(Util.byteToStr(msg[2]));
+    // System.out.println(Util.byteToStr(msg[3]));
+
+
+    // if (Util.byteToStr(msg[2]).equals("/user")) {
+
+    //   Path user = Paths.get(db_root.toString() + sptr + msg[2]);
       
-      try {
-        Files.createFile(user);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+    //   try {
+    //     Files.createFile(user);
+    //   } catch (IOException e) {
+    //     e.printStackTrace();
+    //   }
 
 
-    }
+    // }
 
    // writeToDataBase(parseMessage(recive));
 

@@ -95,7 +95,7 @@ public class Cli implements ICommandLine {
       recive();
     } else if (command.matches("^/help") || command.matches("^11")) {
       help();
-    } else if (command.matches("^@[a-zA-Z]{0,64}\\s.{0,4096}")) {
+    } else if (command.matches("^@[a-zA-Z]{3,64}\\s.{0,4096}")) {
       sendMessage(command);
     } else {
       throw new WrongCommandException(command);

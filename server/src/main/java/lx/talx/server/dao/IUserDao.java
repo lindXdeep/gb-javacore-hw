@@ -2,11 +2,9 @@ package lx.talx.server.dao;
 
 import java.util.List;
 
-import org.json.simple.JSONObject;
-
 import lx.talx.server.model.User;
 
-public interface UserDao {
+public interface IUserDao {
   void add(User user);
 
   List<User> listUsers();

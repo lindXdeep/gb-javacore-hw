@@ -16,12 +16,11 @@ public class MessageAccomulator {
   }
 
   public void readMeaasges(IMessageProcessor messageProcessor) {
+
     thread = new Thread(() -> {
       while (!Thread.currentThread().isInterrupted()) {
 
-
         messageProcessor.process(connect.read());
-
 
       }
     });

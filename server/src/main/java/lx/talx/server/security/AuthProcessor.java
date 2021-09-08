@@ -17,9 +17,10 @@ import lx.talx.server.utils.Util;
 public class AuthProcessor {
 
   private byte[] key = new byte[0];
+  private String username;
 
   private MailService mailService;
-  private UserService userService;
+  private IUserService userService;
   private Server server;
 
   public AuthProcessor(Properties properties, Server server) {
@@ -153,5 +154,19 @@ public class AuthProcessor {
 
   public void disable() {
     key = new byte[0];
+    username = null;
+  }
+
+  public String getCurrentUserName() {
+
+    if (username == null && key.length != 0) {
+      username = userService.getUserByKey(Util.byteToStr(key)).getUserName();
+    }
+
+    return username;
+  }
+
+  public User getUserByUserName(String username) {
+    return userService.getUserByUserName(username);
   }
 }
