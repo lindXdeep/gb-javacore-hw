@@ -38,6 +38,9 @@ public class MessageService {
 
         server.getConnectionPool().sendPrivateMessage(sender, recipent.substring(1).trim(), message);
       }
+    } else if (msg.matches("^/online")) {
+
+      server.getConnectionPool().commandSendUsersOnline();
     }
   }
 }

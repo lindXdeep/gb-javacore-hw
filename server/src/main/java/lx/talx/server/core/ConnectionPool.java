@@ -7,6 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import lx.talx.server.security.AuthProcessor;
 import lx.talx.server.utils.Util;
 
@@ -40,13 +45,8 @@ public class ConnectionPool {
 
   public void sendPrivateMessage(String sender, String recipent, String message) {
 
-
-
-
     byte[] msg = "@".concat(sender.concat(" ").concat(message.trim())).getBytes();
 
-
-    
     if (contains(recipent)) {
       Iterator<Connection> cit = connections.get(recipent).iterator();
       while (cit.hasNext())
@@ -66,5 +66,40 @@ public class ConnectionPool {
       while (it.hasNext())
         it.next().sendSecure(msg.getBytes());
     }
+  }
+
+  public void commandSendUsersOnline() {
+   
+    JSONParser p = new JSONParser();
+
+    try {
+      JSONArray a = (JSONArray) p.parse(getAllUsers());
+
+
+      for (int i = 0; i < a.size(); i++) {
+        System.out.println(a.get(i));
+      }
+
+
+
+    } catch (ParseException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+
+  }
+
+  private String getAllUsers() {
+
+    JSONArray online = new JSONArray();
+
+    Iterator<Entry<String, List<Connection>>> i = connections.entrySet().iterator();
+
+    while (i.hasNext()) {
+      online.add(i.next().getKey());
+    }
+
+    return online.toJSONString();
   }
 }

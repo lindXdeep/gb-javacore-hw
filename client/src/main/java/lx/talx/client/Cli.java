@@ -101,7 +101,7 @@ public class Cli implements ICommandLine {
     } else if (command.matches("^@[a-zA-Z]{3,64}\\s.{0,4096}")) {
       sendMessage(command);
     } else if (command.matches("^/online")) {
-      online(command);
+      online();
     } else if (command.matches("^/read\\s@[a-zA-Z]{0,64}")) {
       read(command);
     } else {
@@ -111,13 +111,12 @@ public class Cli implements ICommandLine {
     Util.printCursor();
   }
 
-  private void read(String command) {
-    System.out.println("read");
+  private void read(String com) {
+    connect.sendSecure(com.getBytes());
   }
 
-  private void online(String command) {
-    System.out.println("online");
-
+  private void online() {
+    connect.sendSecure("/online".getBytes());
   }
 
   private void sendMessage(String command) {
