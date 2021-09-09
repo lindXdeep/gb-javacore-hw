@@ -28,10 +28,6 @@ public class Connection extends Thread {
 
   private MessageService msgServ;
 
-  // regex pattern recipient user
-  private Pattern pUser = Pattern.compile("^@[a-zA-Z]{0,255}\\s");
-  private Pattern pMsg = Pattern.compile("\\s.{0,4096}");
-
   public Connection(Socket client, Server server) throws IOException {
 
     this.buffer = new byte[defBufSeze];
@@ -63,13 +59,17 @@ public class Connection extends Thread {
     }
 
     // new Thread(() -> {
-    // try {
-    // Thread.sleep(5000);
-    // } catch (InterruptedException e) {
-    // e.printStackTrace();
-    // }
 
-    // kill();
+    //   while (true) {
+    //     try {
+    //       Thread.sleep(1000);
+    //     } catch (InterruptedException e) {
+    //       e.printStackTrace();
+    //     }
+
+    //     msgServ.processMessage("@all asdasdsad");
+
+    //   }
     // }).start();
 
     try {
@@ -78,27 +78,16 @@ public class Connection extends Thread {
 
       while (auth.isRevoke() && (buffer = auth.readSecure()).length != 0) {
 
-        if ((msg = Util.byteToStr(buffer)).matches("^@[a-zA-Z]{3,64}\\s.{0,4096}")) {
+        System.out.println("isRevoke: " + auth.isRevoke());
 
-          Matcher m;
-          String sender = server.getAuthProcessor().getCurrentUserName();
-          String recipent = null;
-          String message = null;
-
-          if ((m = pUser.matcher(msg)).find())
-            recipent = msg.substring(m.start(), m.end());
-
-          if ((m = pMsg.matcher(msg)).find())
-            message = msg.substring(m.start(), m.end()).trim();
-
-          msgServ.processMessage(sender, recipent, message);
-
-        }
+        msgServ.processMessage(Util.byteToStr(buffer));
 
         System.out.print(":::" + Util.byteToStr(buffer));
       }
 
-    } catch (RuntimeException e) {
+    } catch (
+
+    RuntimeException e) {
       System.out.println("самоубился");
     }
 
@@ -147,7 +136,7 @@ public class Connection extends Thread {
     try {
       String user = server.getAuthProcessor().getCurrentUserName();
       server.getConnectionPool().delete(user);
-      server.getConnectionPool().broadcast("", "/status" + user + "offline");
+      server.getConnectionPool().broadcast("/status " + user + " offline");
       client.close();
     } catch (IOException e) {
       e.printStackTrace();

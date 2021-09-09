@@ -32,8 +32,11 @@ public class Cli implements ICommandLine {
   private BufferedReader bufIn = new BufferedReader(new InputStreamReader(System.in));
 
   // regex pattern recipient user
-  private Pattern pUser = Pattern.compile("^@[a-zA-Z]{0,255}\\s");
+  private Pattern pUser = Pattern.compile("^@[a-zA-Z]{0,64}\\s");
   private Pattern pMsg = Pattern.compile("\\s.{0,4096}");
+
+  // regex pattern for special symbols
+  private Pattern spc = Pattern.compile("[!@#$%&*()_+=|<>?{}\\[\\]~-]");
 
   // regex pattern for email RFC822 compliant right format
   private Pattern ptr = Pattern.compile(
@@ -97,11 +100,24 @@ public class Cli implements ICommandLine {
       help();
     } else if (command.matches("^@[a-zA-Z]{3,64}\\s.{0,4096}")) {
       sendMessage(command);
+    } else if (command.matches("^/online")) {
+      online(command);
+    } else if (command.matches("^/read\\s@[a-zA-Z]{0,64}")) {
+      read(command);
     } else {
       throw new WrongCommandException(command);
     }
 
     Util.printCursor();
+  }
+
+  private void read(String command) {
+    System.out.println("read");
+  }
+
+  private void online(String command) {
+    System.out.println("online");
+
   }
 
   private void sendMessage(String command) {
@@ -197,7 +213,28 @@ public class Cli implements ICommandLine {
 
     System.out.println("\n--------- Sign up for Talx ---------\n");
 
-    auth.signup(prepareCredentionalData("NickName", "Username", "Email", "Password"));
+    boolean allowedSymbols = true;
+
+    JSONObject user = null;
+
+    while (allowedSymbols) {
+
+      user = prepareCredentionalData("NickName", "Username", "Email", "Password");
+
+      allowedSymbols = (
+
+      spc.matcher(((String) user.get("nickname"))).find() | spc.matcher(((String) user.get("username"))).find()
+
+      );
+
+      if (allowedSymbols) {
+        System.out.println("Forbidden characters are present in the \"NickName\" or \"Username\"");
+      } else {
+        break;
+      }
+    }
+
+    auth.signup(user);
 
     // AuthCode:
     buf = connect.read();
@@ -294,9 +331,15 @@ public class Cli implements ICommandLine {
 
         "11. /help               - Help",
 
-        "@Username <message>     - Send private message for user",
+        "------------------------ Online options ------------------------",
 
-        "@all <message>          - Sand public message for all contacts", };
+        "@<username> <message>   - Send private message for user",
+
+        "@all <message>          - Sand public message for all contacts",
+
+        "/online                 - Show online users",
+
+        "/read <num> <username>  - read last <num> messages from <username>" };
 
     for (String h : help) {
       System.out.println(h);

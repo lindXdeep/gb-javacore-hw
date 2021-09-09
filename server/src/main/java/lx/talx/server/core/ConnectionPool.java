@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import lx.talx.server.security.AuthProcessor;
+import lx.talx.server.utils.Util;
 
 public class ConnectionPool {
 
@@ -37,29 +38,33 @@ public class ConnectionPool {
     return connections.containsKey(username);
   }
 
-  public void broadcast(String msg) {
+  public void sendPrivateMessage(String sender, String recipent, String message) {
 
-    Iterator<Entry<String, List<Connection>>> allconnects = connections.entrySet().iterator();
 
-    while (allconnects.hasNext()) {
 
-      Iterator<Connection> it = allconnects.next().getValue().iterator();
 
-      while (it.hasNext()) {
-        it.next().sendSecure(msg.getBytes());
-      }
+    byte[] msg = "@".concat(sender.concat(" ").concat(message.trim())).getBytes();
+
+
+    
+    if (contains(recipent)) {
+      Iterator<Connection> cit = connections.get(recipent).iterator();
+      while (cit.hasNext())
+        cit.next().sendSecure(msg);
     }
   }
 
-  public void broadcast(String recipent, String message) {
+  public void sendPublicMessage(String sender, String message) {
+    broadcast("@".concat(sender.concat(" ").concat(message.trim())));
+  }
 
-    if (contains(recipent)) {
+  public void broadcast(String msg) {
 
-      Iterator<Connection> cit = connections.get(recipent).iterator();
-
-      while (cit.hasNext()) {
-        cit.next().sendSecure(message.getBytes());
-      }
+    Iterator<Entry<String, List<Connection>>> allconnects = connections.entrySet().iterator();
+    while (allconnects.hasNext()) {
+      Iterator<Connection> it = allconnects.next().getValue().iterator();
+      while (it.hasNext())
+        it.next().sendSecure(msg.getBytes());
     }
   }
 }

@@ -55,8 +55,9 @@ public class Auth {
       connect.send(request.array());
 
       buf = connect.read();
-                                                       
+
       if (new String(buf, 0, buf.length).equals("/accepted")) {
+
         return true;
       }
       return false;
@@ -118,6 +119,7 @@ public class Auth {
     connect.send(authcode);
 
     if ((buf = connect.read()).length != 0) {
+
       credential.saveKey(buf);
       key();
       return true;

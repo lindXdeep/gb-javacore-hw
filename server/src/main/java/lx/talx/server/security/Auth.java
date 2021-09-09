@@ -36,6 +36,9 @@ public class Auth {
       String key = new String(buffer, 15, buffer.length - 15);
 
       if (server.getAuthProcessor().enable(key)) {
+
+        System.out.println("send /accepted");
+
         connection.sendEncrypted("/accepted".getBytes());
         return true;
       }
@@ -63,8 +66,8 @@ public class Auth {
       // if auth right then send [key] or [0]
       if (String.valueOf(authcode).equals(new String(responseAuthcode, 0, responseAuthcode.length))) {
         connection.sendEncrypted(server.getAuthProcessor().create(tmpUser, authcode)); // send key for autologin
+                
         Log.info("New User: " + (String) tmpUser.get("username") + " / " + (String) tmpUser.get("email"));
-        return true;
       }
     }
 
