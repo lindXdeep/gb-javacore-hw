@@ -3,6 +3,9 @@ package lx.talx.client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,6 +33,8 @@ public class Cli implements ICommandLine {
 
   private Auth auth;
   private BufferedReader bufIn = new BufferedReader(new InputStreamReader(System.in));
+
+  private Matcher m;
 
   // regex pattern recipient user
   private Pattern pUser = Pattern.compile("^@[a-zA-Z]{0,64}\\s");
@@ -94,16 +99,16 @@ public class Cli implements ICommandLine {
       logout();
     } else if (command.matches("^/exit") || command.matches("^9")) {
       exit();
-    } else if (command.matches("^/recive") || command.matches("^10")) {
-      recive();
-    } else if (command.matches("^/help") || command.matches("^11")) {
+    } else if (command.matches("^/help") || command.matches("^10")) {
       help();
     } else if (command.matches("^@[a-zA-Z]{3,64}\\s.{0,4096}")) {
       sendMessage(command);
     } else if (command.matches("^/online")) {
       online();
-    } else if (command.matches("^/read\\s@[a-zA-Z]{0,64}")) {
+    } else if (command.matches("^/read\\s@[a-zA-Z]{3,64}\\s\\d{1,4}")) {
       read(command);
+    } else if (command.matches("^/read\\s@[a-zA-Z]{3,64}")) {
+      read(command.concat(" " + 10));
     } else {
       throw new WrongCommandException(command);
     }
@@ -111,8 +116,51 @@ public class Cli implements ICommandLine {
     Util.printCursor();
   }
 
-  private void read(String com) {
-    connect.sendSecure(com.getBytes());
+  private void read(String command) {
+
+    DateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy hh:mm:ss");
+    Pattern pUser = Pattern.compile("@[a-zA-Z]{0,64}\\s");
+    Pattern pNum = Pattern.compile("\\s\\d{1,4}");
+
+    String user = null;
+    String numlastMsgs = null;
+
+    if ((m = pUser.matcher(command)).find())
+      user = command.substring(m.start(), m.end()).trim();
+
+    if ((m = pNum.matcher(command)).find())
+      numlastMsgs = command.substring(m.start(), m.end()).trim();
+
+    List<String> msgs = auth.getMsgProcessor().getMessages(Integer.parseInt(numlastMsgs), user);
+
+    System.out.println("\nMessages:\n");
+
+    String resDate = null;
+    String resMsg = null;
+
+    // view messages
+    for (String s : msgs) {
+
+      String msgFromSender = "^\\d{10,20}\\s>>>\\s.{1,4096}$"; // >>>
+      String msgForRecipient = "^\\d{10,20}\\s<<<\\s.{1,4096}$"; // <<<
+
+      // parse Date
+      Pattern pSrcDate = Pattern.compile("^\\d{10,20}\\s");
+      if ((m = pSrcDate.matcher(s)).find())
+        resDate = dateFormat.format(Long.parseLong(s.substring(m.start(), m.end()).trim()));
+
+      // parse message
+      Pattern pSrcMsg = Pattern.compile("\\s(<<<|>>>)\\s.{1,4096}$");
+      if ((m = pSrcMsg.matcher(s)).find())
+        resMsg = s.substring(m.start() + 4, m.end()).trim();
+
+      if (s.matches(msgFromSender)) { // >>>
+        System.out.println("[" + resDate + "]" + user + " <<< " + resMsg);
+
+      } else if (s.matches(msgForRecipient)) { // <<<
+        System.out.println("[" + resDate + "]" + user + " >>> " + resMsg);
+      }
+    }
   }
 
   private void online() {
@@ -121,7 +169,6 @@ public class Cli implements ICommandLine {
 
   private void sendMessage(String command) {
 
-    Matcher m;
     String user = null;
     String message = null;
 
@@ -136,9 +183,8 @@ public class Cli implements ICommandLine {
     } catch (CantWriteBytesExeption e) {
       System.out.println("жопа говно");
     }
-  }
 
-  private void recive() {
+    writeForRecipient(user, message);
 
   }
 
@@ -326,9 +372,7 @@ public class Cli implements ICommandLine {
 
         " 9. /exit               - Exit from the Talx",
 
-        "10. /recive             - Read current stream",
-
-        "11. /help               - Help",
+        "10. /help               - Help",
 
         "------------------------ Online options ------------------------",
 
@@ -338,10 +382,23 @@ public class Cli implements ICommandLine {
 
         "/online                 - Show online users",
 
-        "/read <num> <username>  - read last <num> messages from <username>" };
+        "/read <username>        - read last 10 messages from <username>",
+
+        "/read <username> <num>  - read last <num> messages from <username>" };
 
     for (String h : help) {
       System.out.println(h);
     }
+  }
+
+  private void writeForRecipient(String user, String message) {
+    new Thread(() -> {
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      auth.getMsgProcessor().writeForRecipient(user, message);
+    }).start();
   }
 }

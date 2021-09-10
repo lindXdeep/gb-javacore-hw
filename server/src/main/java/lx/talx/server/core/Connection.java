@@ -98,6 +98,7 @@ public class Connection extends Thread {
   }
 
   public void sendEncrypted(byte[] bytes) {
+
     protocol.sendEncrypted(bytes);
   }
 
@@ -164,6 +165,7 @@ public class Connection extends Thread {
   }
 
   public void sendSecure(byte[] bytes) {
+
     auth.sendSecure(bytes);
   }
 }

@@ -1,27 +1,30 @@
 package lx.talx.client.core;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+import java.util.regex.*;
+
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import lx.talx.client.service.IMessageProcessor;
 import lx.talx.client.utils.Log;
-import lx.talx.client.utils.Util;
 
 public class MsgProcessor implements IMessageProcessor {
+
+  // regex pattern recipient user
+  private Pattern pUser = Pattern.compile("^@[a-zA-Z]{0,64}\\s");
+  private Pattern pMsg = Pattern.compile("\\s.{0,4096}");
+  private Matcher m;
+
+  private Date date = new Date();
 
   private Path root = Paths.get("");
   private Path sptr = Paths.get(File.separator);
   private Path db = Paths.get("db");
   private Path db_root = Paths.get(new String(db.toString() + sptr));
-
-  FileOutputStream fout;
 
   public MsgProcessor() {
 
@@ -31,63 +34,79 @@ public class MsgProcessor implements IMessageProcessor {
   }
 
   @Override
-  public void process(final byte[] recive) {
+  public void processMessage(String recive) {
 
-    System.out.println(Util.byteToStr(recive));
-
-
-    // System.out.println("+++++++++++");
-
-    // byte[][] msg = parseMessage(recive);
-
-    // System.out.println(Util.byteToStr(msg[0]));
-    // System.out.println(Util.byteToStr(msg[1]));
-    // System.out.println(Util.byteToStr(msg[2]));
-    // System.out.println(Util.byteToStr(msg[3]));
-
-
-    // if (Util.byteToStr(msg[2]).equals("/user")) {
-
-    //   Path user = Paths.get(db_root.toString() + sptr + msg[2]);
-      
-    //   try {
-    //     Files.createFile(user);
-    //   } catch (IOException e) {
-    //     e.printStackTrace();
-    //   }
-
-
-    // }
-
-   // writeToDataBase(parseMessage(recive));
-
+    if (recive.matches("^@[a-zA-Z]{3,64}\\s.{0,4096}")) {
+      writeFromSender(recive);
+    }
   }
 
-  private byte[][] parseMessage(byte[] recive) {
+  @Override
+  public void processCommand(String recive) {
 
-    int lengthMsg = Util.byteToInt(Arrays.copyOfRange(recive, 128, 132));
-
-    return new byte[][] {
-        // sender
-        Arrays.copyOfRange(recive, 0, 64),
-        // recipient
-        Arrays.copyOfRange(recive, 64, 128),
-        // command
-        Arrays.copyOfRange(recive, 128, 148),
-        // message
-        Arrays.copyOfRange(recive, 152, lengthMsg + 152) };
+    if (recive.startsWith("/online")) {
+      showOnline(recive.substring(8));
+    }
   }
 
-  private void writeToDataBase(byte[][] msg) {
+  @Override
+  public List<String> getMessages(int num, String user) {
 
-    Path user = Paths.get(db_root.toString() + sptr + msg[0]);
+    Path p = Paths.get("db" + sptr + user);
+    List<String> msgs = new ArrayList<>();
 
+    if (Files.exists(p, LinkOption.NOFOLLOW_LINKS)) {
+
+      try (BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream("db" + sptr + user)))) {
+
+        String tmp;
+        while ((tmp = in.readLine()) != null) {
+
+          msgs.add(tmp);
+          if (msgs.size() == num)
+            msgs.remove(0);
+        }
+
+        in.close();
+
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    return msgs;
   }
 
-  private void write(String message) {
-    try {
-      fout.write(message.getBytes());
+  @Override
+  public void writeFromSender(String recive) {
+    String user = null;
+    String message = null;
+    long time = date.getTime();
+
+    if ((m = pUser.matcher(recive)).find())
+      user = recive.substring(m.start(), m.end());
+
+    if ((m = pMsg.matcher(recive)).find())
+      message = recive.substring(m.start(), m.end()).trim();
+
+      System.out.println(user + time + ">>>>" + "\n");
+
+    write(user, time + " >>> " + message + "\n");
+  }
+
+  @Override
+  public void writeForRecipient(String user, String message) {
+
+    long time = date.getTime();
+
+     write(user, time + " <<< " + message + "\n");
+  }
+
+  private void write(String user, String msg) {
+
+    try (DataOutputStream fout = new DataOutputStream(new FileOutputStream("db" + sptr + user.trim(), true))) {
+      fout.write(msg.getBytes());
       fout.flush();
+      fout.close();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -111,5 +130,25 @@ public class MsgProcessor implements IMessageProcessor {
     System.exit(0);
 
     return false;
+  }
+
+  private void showOnline(String jsonArr) {
+
+    JSONParser p = new JSONParser();
+
+    System.out.println("\n\nUsers:");
+
+    try {
+      JSONArray a = (JSONArray) p.parse(jsonArr);
+
+      for (int i = 0; i < a.size(); i++) {
+        System.out.println("    @" + a.get(i) + " - online!");
+      }
+
+    } catch (ParseException e) {
+      e.printStackTrace();
+    }
+
+    System.out.print("\n::>");
   }
 }

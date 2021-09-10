@@ -4,8 +4,10 @@ import java.nio.ByteBuffer;
 
 import org.json.simple.JSONObject;
 
-import lx.talx.client.core.Account;
+import lx.talx.client.core.MessageAccomulator;
+import lx.talx.client.core.MsgProcessor;
 import lx.talx.client.security.UserCredential;
+import lx.talx.client.service.IMessageProcessor;
 
 public class Auth {
 
@@ -13,17 +15,20 @@ public class Auth {
 
   private byte[] key;
   private byte[] buf;
-  private JSONObject user;
 
   private UserCredential credential;
 
   private Connect connect;
-  private Account account;
+
+  private MessageAccomulator acc;
+  private IMessageProcessor msgProcessor;
 
   public Auth(Connect connect) {
     this.connect = connect;
     this.credential = new UserCredential();
-    Account account = new Account(connect);
+
+    this.acc = new MessageAccomulator(connect);
+    this.msgProcessor = new MsgProcessor();
   }
 
   public boolean enterToAccount() {
@@ -31,7 +36,9 @@ public class Auth {
     if (key()) { // if key accepted then loged to account
 
       Thread th = new Thread(() -> {
-        account = new Account(connect);
+
+        acc.readMeaasges(msgProcessor);
+
       });
       th.start();
 
@@ -139,5 +146,9 @@ public class Auth {
 
   public boolean isLoginStatus() {
     return loginStatus;
+  }
+
+  public IMessageProcessor getMsgProcessor() {
+    return msgProcessor;
   }
 }

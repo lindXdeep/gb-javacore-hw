@@ -43,12 +43,12 @@ public class ConnectionPool {
     return connections.containsKey(username);
   }
 
-  public void sendPrivateMessage(String sender, String recipent, String message) {
+  public void sendPrivateMessage(String sender, String recipient, String message) {
 
     byte[] msg = "@".concat(sender.concat(" ").concat(message.trim())).getBytes();
 
-    if (contains(recipent)) {
-      Iterator<Connection> cit = connections.get(recipent).iterator();
+    if (contains(recipient)) {
+      Iterator<Connection> cit = connections.get(recipient).iterator();
       while (cit.hasNext())
         cit.next().sendSecure(msg);
     }
@@ -68,29 +68,25 @@ public class ConnectionPool {
     }
   }
 
-  public void commandSendUsersOnline() {
-   
-    JSONParser p = new JSONParser();
-
-    try {
-      JSONArray a = (JSONArray) p.parse(getAllUsers());
-
-
-      for (int i = 0; i < a.size(); i++) {
-        System.out.println(a.get(i));
-      }
-
-
-
-    } catch (ParseException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-
-
+  public void executeSendUsersOnline(String sender, String command) {
+    sendResponse(sender, command, getAllUsers());
   }
 
-  private String getAllUsers() {
+  private void sendResponse(String recipient, String command, String response) {
+
+
+    String msg = command.concat(" ").concat(response);
+
+    System.out.println("send1: " + msg);
+
+    if (contains(recipient)) {
+      Iterator<Connection> cit = connections.get(recipient).iterator();
+      while (cit.hasNext())
+        cit.next().sendSecure(msg.getBytes());
+    }
+  }
+
+  public String getAllUsers() {
 
     JSONArray online = new JSONArray();
 
@@ -102,4 +98,5 @@ public class ConnectionPool {
 
     return online.toJSONString();
   }
+
 }
