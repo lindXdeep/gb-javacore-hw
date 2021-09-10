@@ -181,7 +181,7 @@ public class Cli implements ICommandLine {
     try {
       connect.sendMessage(user, message);
     } catch (CantWriteBytesExeption e) {
-      System.out.println("жопа говно");
+
     }
 
     writeForRecipient(user, message);
@@ -220,18 +220,25 @@ public class Cli implements ICommandLine {
   }
 
   private void disconnect() {
+
+    if (connect.getStatus()) {
+      connect.sendSecure("/disconnect".getBytes());
+    }
+
     if (!connect.disconnect()) {
       System.out.println("\nNo connection to server\n");
     }
   }
 
   private void status() {
+
     if (connect.getStatus()) {
-      System.out.print("Connected on: " + connect.getAddress());
+
+      System.out.print("\nConnected on: " + connect.getAddress());
       if (auth.isLoginStatus()) {
-        System.out.println(" ->  login in account");
+        System.out.println(" ->  login in account\n");
       } else {
-        System.out.println(" ->  no authorization");
+        System.out.println(" ->  no authorization\n");
       }
     } else {
       System.out.println("\ndisconnected\n");

@@ -1,11 +1,9 @@
-package lx.talx.server.service;
+package lx.talx.server.core;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lx.talx.server.core.Server;
-
-public class MessageService {
+public class Controller {
 
   // regex pattern recipient user
   private Pattern pUsr = Pattern.compile("^@[a-zA-Z]{0,255}\\s");
@@ -13,7 +11,7 @@ public class MessageService {
 
   private Server server;
 
-  public MessageService(Server server) {
+  public Controller(Server server) {
     this.server = server;
   }
 
@@ -35,11 +33,21 @@ public class MessageService {
       if (recipent.matches("^@all\\s")) {
         server.getConnectionPool().sendPublicMessage(sender, message);
       } else if (recipent.matches("^@[a-zA-Z]{0,64}\\s")) {
-
         server.getConnectionPool().sendPrivateMessage(sender, recipent.substring(1).trim(), message);
       }
+
     } else if (msg.matches("^/online")) {
       server.getConnectionPool().executeSendUsersOnline(sender, msg);
+
+    } else if (msg.matches("^/disconnect")) {
+
+      sender = server.getAuthProcessor().getCurrentUserName();
+
+      server.getConnectionPool().killAllUsersConnections(sender);
+      server.getConnectionPool().delete(sender);
+      server.getAuthProcessor().disable();
+    } else if (msg.matches("^/ping")) {
+      server.getConnectionPool().ping(sender);
     }
   }
 }

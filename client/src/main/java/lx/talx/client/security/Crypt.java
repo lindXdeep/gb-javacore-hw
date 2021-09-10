@@ -84,16 +84,15 @@ public class Crypt {
       AlgorithmParameters aesParams = AlgorithmParameters.getInstance("AES");
 
       aesParams.init(encodeSpec);
-
+   
       Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
       cipher.init(Cipher.DECRYPT_MODE, keyAES, aesParams);
 
       return cipher.doFinal(cipherMsg);
 
     } catch (GeneralSecurityException | IOException e) {
-      e.printStackTrace();
+      System.out.println("Can't decrypt");
     }
-
-    throw new RuntimeException();
+    throw new RuntimeException("Lost connection to server");
   }
 }

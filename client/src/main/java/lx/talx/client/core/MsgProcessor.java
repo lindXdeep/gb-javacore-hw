@@ -46,6 +46,10 @@ public class MsgProcessor implements IMessageProcessor {
 
     if (recive.startsWith("/online")) {
       showOnline(recive.substring(8));
+    } else if (recive.startsWith("/status")) {
+      System.out.print("\n" + recive.substring(7) + "\n\n::>");
+    } else if (recive.startsWith("/ping")) {
+      // ignore
     }
   }
 
@@ -88,8 +92,6 @@ public class MsgProcessor implements IMessageProcessor {
     if ((m = pMsg.matcher(recive)).find())
       message = recive.substring(m.start(), m.end()).trim();
 
-      System.out.println(user + time + ">>>>" + "\n");
-
     write(user, time + " >>> " + message + "\n");
   }
 
@@ -98,7 +100,7 @@ public class MsgProcessor implements IMessageProcessor {
 
     long time = date.getTime();
 
-     write(user, time + " <<< " + message + "\n");
+    write(user, time + " <<< " + message + "\n");
   }
 
   private void write(String user, String msg) {

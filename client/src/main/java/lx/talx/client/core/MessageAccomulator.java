@@ -20,7 +20,7 @@ public class MessageAccomulator {
       while (!Thread.currentThread().isInterrupted()) {
 
         String recive = Util.byteToStr(connect.read());
-        
+
         if (recive.matches("^@[a-zA-Z]{3,64}\\s.{0,4096}")) {
           msgProcessor.processMessage(recive);
 

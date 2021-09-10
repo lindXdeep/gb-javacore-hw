@@ -37,8 +37,6 @@ public class Auth {
 
       if (server.getAuthProcessor().enable(key)) {
 
-        System.out.println("send /accepted");
-
         connection.sendEncrypted("/accepted".getBytes());
         return true;
       }

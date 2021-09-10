@@ -38,4 +38,8 @@ public class Log {
   public static void status(String user, String status) {
     info("Status: " + user + " - " + status);
   }
+
+  public static void log(String user, String command) {
+    info("Log: @".concat(user).concat(" ") + command);
+  }
 }

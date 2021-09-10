@@ -105,13 +105,15 @@ public class Connection extends Thread {
   }
 
   public boolean kill() {
+
     if (socket != null) {
       try {
+        Thread.sleep(1000);
         socket.close();
         connected = false;
         socket = null;
         return true;
-      } catch (IOException e) {
+      } catch (InterruptedException | IOException e) {
         e.printStackTrace();
       }
     }

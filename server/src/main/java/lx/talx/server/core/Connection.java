@@ -1,14 +1,16 @@
 package lx.talx.server.core;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import lx.talx.server.error.*;
+import lx.talx.server.error.CantReadBytesExeption;
+import lx.talx.server.error.CantWriteBytesExeption;
 import lx.talx.server.security.Auth;
 import lx.talx.server.security.CryptProtocol;
-import lx.talx.server.service.MessageService;
 import lx.talx.server.utils.Log;
 import lx.talx.server.utils.Util;
 
@@ -26,7 +28,9 @@ public class Connection extends Thread {
   private CryptProtocol protocol;
   private Auth auth;
 
-  private MessageService msgServ;
+  private Controller controller;
+
+  private String curUser = "";
 
   public Connection(Socket client, Server server) throws IOException {
 
@@ -37,7 +41,7 @@ public class Connection extends Thread {
     this.protocol = new CryptProtocol(this);
     this.auth = new Auth(this);
 
-    this.msgServ = new MessageService(server);
+    this.controller = new Controller(server);
 
     this.in = new DataInputStream(new BufferedInputStream(client.getInputStream()));
     this.out = new DataOutputStream(new BufferedOutputStream(client.getOutputStream()));
@@ -58,39 +62,22 @@ public class Connection extends Thread {
       server.getConnectionPool().add(this);
     }
 
-    // new Thread(() -> {
-
-    //   while (true) {
-    //     try {
-    //       Thread.sleep(1000);
-    //     } catch (InterruptedException e) {
-    //       e.printStackTrace();
-    //     }
-
-    //     msgServ.processMessage("@all asdasdsad");
-
-    //   }
-    // }).start();
+    curUser = server.getAuthProcessor().getCurrentUserName();
 
     try {
 
-      String msg = null;
-
       while (auth.isRevoke() && (buffer = auth.readSecure()).length != 0) {
 
-        System.out.println("isRevoke: " + auth.isRevoke());
+        controller.processMessage(Util.byteToStr(buffer));
 
-        msgServ.processMessage(Util.byteToStr(buffer));
-
-        System.out.print(":::" + Util.byteToStr(buffer));
+        Log.log(curUser, Util.byteToStr(buffer));
       }
 
-    } catch (
-
-    RuntimeException e) {
-      System.out.println("самоубился");
+    } catch (RuntimeException e) {
+      Log.info("Lost connection to @" + curUser);
+      kill();
+      server.getConnectionPool().delete(curUser);
     }
-
   }
 
   public byte[] readEncrypted() {
@@ -135,9 +122,7 @@ public class Connection extends Thread {
 
   public void kill() {
     try {
-      String user = server.getAuthProcessor().getCurrentUserName();
-      server.getConnectionPool().delete(user);
-      server.getConnectionPool().broadcast("/status " + user + " offline");
+      server.getConnectionPool().broadcastStatusOffline(curUser);
       client.close();
     } catch (IOException e) {
       e.printStackTrace();

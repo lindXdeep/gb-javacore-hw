@@ -8,12 +8,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.json.simple.JSONArray;
-import org.json.simple.JSONValue;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import lx.talx.server.security.AuthProcessor;
-import lx.talx.server.utils.Util;
+import lx.talx.server.utils.Log;
 
 public class ConnectionPool {
 
@@ -28,15 +25,17 @@ public class ConnectionPool {
 
     String username = authProcessor.getCurrentUserName();
 
-    if (!contains(username)) {
+    if (!contains(username))
       connections.put(username, new ArrayList<Connection>());
-    }
 
     connections.get(username).add(connection);
+    broadcastStatusOnline(username);
+    Log.info("@".concat(username) + " - Online!");
   }
 
   public void delete(String username) {
     connections.remove(username);
+    Log.info("@".concat(username) + " - Offline...");
   }
 
   public boolean contains(String username) {
@@ -68,16 +67,21 @@ public class ConnectionPool {
     }
   }
 
+  public void broadcastStatusOnline(String username) {
+    broadcast("/status ".concat("@").concat(username).concat(" ").concat("online"));
+  }
+
+  public void broadcastStatusOffline(String username) {
+    broadcast("/status ".concat("@").concat(username).concat(" ").concat("offline"));
+  }
+
   public void executeSendUsersOnline(String sender, String command) {
     sendResponse(sender, command, getAllUsers());
   }
 
   private void sendResponse(String recipient, String command, String response) {
 
-
     String msg = command.concat(" ").concat(response);
-
-    System.out.println("send1: " + msg);
 
     if (contains(recipient)) {
       Iterator<Connection> cit = connections.get(recipient).iterator();
@@ -99,4 +103,17 @@ public class ConnectionPool {
     return online.toJSONString();
   }
 
+  public List<Connection> getConnectionByUsername(String username) {
+    return connections.get(username);
+  }
+
+  public void killAllUsersConnections(String username) {
+    for (Connection c : getConnectionByUsername(username)) {
+      c.kill();
+    }
+  }
+
+  public void ping(String sender) {
+    sendResponse(sender, "/ping", "1");
+  }
 }
