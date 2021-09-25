@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * App
  */
@@ -11,9 +15,12 @@ public class App {
     swap(array1, 1, 2);
     swap(array2, 0, 2);
 
-    printArr(array1);
-    printArr(array2);
+    Util.printArr(array1);
+    Util.printArr(array2);
 
+    // 2. Написать метод, который преобразует массив в ArrayList;
+    List<Integer> listArr = toArrayList(array1);
+    Util.printArr(listArr);
   }
 
   public static <T> void swap(T[] arr, int a, int b) {
@@ -22,11 +29,10 @@ public class App {
     arr[b] = tmp;
   }
 
-  public static <T> void printArr(T[] arr) {
-    System.out.println();
-    for (T t : arr) {
-      System.out.print(t + " ");
-    }
-    System.out.println();
+  public static <T> ArrayList<T> toArrayList(T[] arr) {
+    ArrayList<T> a = new ArrayList<>();
+    for (T t : arr)
+      a.add(t);
+    return a;
   }
 }
