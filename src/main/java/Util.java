@@ -18,4 +18,25 @@ public class Util {
       System.out.print(it.next() + " ");
     }
   }
+
+  public static <T extends Fruit> void fillBox(final Box<T> box, T fruit, int n) {
+    for (int i = 0; i < n; i++) {
+      box.addFruit(fruit);
+    }
+  }
+
+  public static <T extends Fruit> void showBox(Box<T> box) {
+
+    if (box.getFruits().size() != 0) {
+      System.out.print(box.getFruits().get(0).getClass().getName() + "'s: ");
+    } else {
+      System.out.println("box empty");
+      return;
+    }
+
+    Iterator<?> it = box.getFruits().iterator();
+    while (it.hasNext())
+      System.out.print(((Fruit) it.next()).getWeight() + " ");
+    System.out.println();
+  }
 }
