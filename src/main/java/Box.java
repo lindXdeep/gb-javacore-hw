@@ -22,13 +22,14 @@ public class Box<T extends Fruit> {
   }
 
   public boolean compare(final Box<?> box) {
-    return getWeight() == box.getWeight();
+    return Math.abs(getWeight() - box.getWeight()) < 0.0001;
   }
 
   public void pourAll(Box<? super T> another) {
-    if (!this.equals(another))
+    if (this != another) {
       for (T t : fruits)
         another.addFruit(t);
-    fruits.clear();
+      fruits.clear();
+    }    
   }
 }

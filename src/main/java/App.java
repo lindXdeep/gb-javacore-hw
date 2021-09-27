@@ -52,8 +52,8 @@ public class App {
     Util.showBox(orangeOther);
   }
 
-  public static <T> void swap(T[] arr, int a, int b) {
-    T tmp = arr[a];
+  public static void swap(Object[] arr, int a, int b) {
+    Object tmp = arr[a];
     arr[a] = arr[b];
     arr[b] = tmp;
   }

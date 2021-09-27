@@ -3,8 +3,8 @@ import java.util.List;
 
 public class Util {
 
-  public static <T> void printArr(T[] arr) {
-    for (T t : arr) {
+  public static void printArr(Object[] arr) {
+    for (Object t : arr) {
       System.out.print(t + " ");
     }
     System.out.println();
