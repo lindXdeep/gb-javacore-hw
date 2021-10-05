@@ -40,15 +40,19 @@
      7. `/reconnect`              - Reconnect to the Server
      8. `/logout`                 - Logout from the user account
      9. `/exit`                   - Exit from the Talx
-    1.  `/help`                   - Help
-    2.  `@<username> <message>`   - Send private message for user
-    3.  `@all <message> `         - Sand public message for all contacts
-    4.  `/online `                - Show online users
-    5.  `/read <username>`        - read last 10 messages from `<username>`
-    6.  `/read <username> <num>`  - read last `<num>` messages from `<username>`
+    10. `/help`                   - Help
+    11. `@<username> <message>`   - Send private message for user
+    12. `@all <message> `         - Sand public message for all contacts
+    13. `/online `                - Show online users
+    14. `/read <username>`        - read last 10 messages from `<username>`
+    15. `/read <username> <num>`  - read last `<num>` messages from `<username>`
+    16. `/edit <parameter>`       - edit profile: `nickname` or `password`
+    17. `/whoami`                 - about me
+    17. `/delete`                 - delete account
   - Asymmetric message encryption
   - Data transfer secure protocol
   - Auto login after authentication
   - Messages are stored in the user folder
+  
 
 ### &#128295; Bug Fixes:
