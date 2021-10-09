@@ -16,11 +16,6 @@ import lx.talx.client.utils.Log;
 
 public class MsgProcessor implements IMessageProcessor {
 
-  // regex pattern recipient user
-  private Pattern pUser = Pattern.compile("^@[a-zA-Z]{0,64}\\s");
-  private Pattern pMsg = Pattern.compile("\\s.{0,4096}");
-  private Matcher m;
-
   @Override
   public void processMessage(String recive) {
 
