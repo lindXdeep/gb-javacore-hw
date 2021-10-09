@@ -62,4 +62,22 @@ public class MsgProcessor implements IMessageProcessor {
 
     System.out.print("\n::>");
   }
+
+  @Override
+  public List<String> getMessages(int num, String user) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void writeFromSender(String recive) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void writeForRecipient(String user, String message) {
+    // TODO Auto-generated method stub
+    
+  }
 }
