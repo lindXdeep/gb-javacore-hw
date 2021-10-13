@@ -21,6 +21,20 @@ public class MsgProcessor implements IMessageProcessor {
   private Pattern pMsg = Pattern.compile("\\s.{0,4096}");
   private Matcher m;
 
+  private Date date = new Date();
+
+  private Path root = Paths.get("");
+  private Path sptr = Paths.get(File.separator);
+  private Path db = Paths.get("db");
+  private Path db_root = Paths.get(new String(db.toString() + sptr));
+
+  public MsgProcessor() {
+
+    if (!checkDbDir()) {
+      Log.log("Unable to create database for messages");
+    }
+  }
+
   @Override
   public void processMessage(String recive) {
 
@@ -38,7 +52,7 @@ public class MsgProcessor implements IMessageProcessor {
       System.out.print("\n" + recive.substring(7) + "\n\n::>");
     } else if (recive.startsWith("/ping")) {
       // ignore
-    }else if (recive.startsWith("/whoami")) {
+    } else if (recive.startsWith("/whoami")) {
       JSONObject juser = (JSONObject) JSONValue.parse(recive.substring(7));
       System.out.println("\n  ID:       " + juser.get("id"));
       System.out.println("  Email:    " + juser.get("email"));
@@ -46,6 +60,87 @@ public class MsgProcessor implements IMessageProcessor {
       System.out.println("  Nickname: " + juser.get("nickname"));
       System.out.print("\n::>");
     }
+  }
+
+  @Override
+  public List<String> getMessages(int num, String user) {
+
+    Path p = Paths.get("db" + sptr + user);
+    List<String> msgs = new ArrayList<>();
+
+    if (Files.exists(p, LinkOption.NOFOLLOW_LINKS)) {
+
+      try (BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream("db" + sptr + user)))) {
+
+        String tmp;
+        while ((tmp = in.readLine()) != null) {
+
+          msgs.add(tmp);
+          if (msgs.size() == num)
+            msgs.remove(0);
+        }
+
+        in.close();
+
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    return msgs;
+  }
+
+  @Override
+  public void writeFromSender(String recive) {
+    String user = null;
+    String message = null;
+    long time = date.getTime();
+
+    if ((m = pUser.matcher(recive)).find())
+      user = recive.substring(m.start(), m.end());
+
+    if ((m = pMsg.matcher(recive)).find())
+      message = recive.substring(m.start(), m.end()).trim();
+
+    write(user, time + " >>> " + message + "\n");
+  }
+
+  @Override
+  public void writeForRecipient(String user, String message) {
+
+    long time = date.getTime();
+
+    write(user, time + " <<< " + message + "\n");
+  }
+
+  private void write(String user, String msg) {
+
+    try (DataOutputStream fout = new DataOutputStream(new FileOutputStream("db" + sptr + user.trim(), true))) {
+      fout.write(msg.getBytes());
+      fout.flush();
+      fout.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private boolean checkDbDir() {
+    if (Files.isReadable(root) && Files.isWritable(root)) {
+      if (!Files.exists(db, LinkOption.NOFOLLOW_LINKS)
+          || (Files.exists(db, LinkOption.NOFOLLOW_LINKS) && !Files.isDirectory(db, LinkOption.NOFOLLOW_LINKS))) {
+        try {
+          Files.createDirectory(db);
+          return true;
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+      return true;
+    }
+
+    Log.log("No permission to write in the current program directory");
+    System.exit(0);
+
+    return false;
   }
 
   private void showOnline(String jsonArr) {
