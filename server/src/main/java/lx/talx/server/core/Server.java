@@ -38,14 +38,9 @@ public class Server extends Thread {
           socket = serverSocket.accept();
           Log.info("Client" + Util.getAddress(socket) + "connected!");
 
-
-          // Thread connection = new Thread(new Connection(socket, this));
-          // connection.start();
-
           ExecutorService executorService = Executors.newFixedThreadPool(100);
           executorService.submit(new Connection(socket, this));
           executorService.shutdown();
-
         }
       } catch (BindException e) {
         this.PORT = Util.getFreePort();
