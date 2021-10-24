@@ -1,8 +1,12 @@
+import java.util.concurrent.CountDownLatch;
+
 public class App {
   
   public static final int CARS_COUNT = 4;
 
-  public static void main(String[] args) {
+  public static final CountDownLatch CDL_FINISH = new CountDownLatch(CARS_COUNT);
+
+  public static void main(String[] args) throws InterruptedException {
 
     System.out.println("ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Подготовка!!!");
 
@@ -29,6 +33,9 @@ public class App {
     }
 
     System.out.println("ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Гонка началась!!!");
+
+
+    CDL_FINISH.await();
     System.out.println("ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Гонка закончилась!!!");
   }
 }
