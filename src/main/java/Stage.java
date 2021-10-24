@@ -1,4 +1,5 @@
 
+
 public abstract class Stage {
 
   protected int length;
