@@ -1,3 +1,5 @@
+import java.util.concurrent.CountDownLatch;
+
 public class Car implements Runnable {
 
   private static int CARS_COUNT;
@@ -37,6 +39,5 @@ public class Car implements Runnable {
     for (int i = 0; i < race.getStages().size(); i++) {
       race.getStages().get(i).go(this);
     }
-
   }
 }
