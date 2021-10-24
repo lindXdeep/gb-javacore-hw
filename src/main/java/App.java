@@ -22,6 +22,8 @@ public class App {
       cars[i] = new Car(race, 20 + (int) (Math.random() * 10));
     }
 
+    System.out.println("Start");
+
     for (int i = 0; i < cars.length; i++) {
       new Thread(cars[i]).start();
     }
