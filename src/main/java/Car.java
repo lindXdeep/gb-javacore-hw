@@ -1,4 +1,3 @@
-import java.util.concurrent.CountDownLatch;
 
 public class Car implements Runnable {
 
@@ -32,7 +31,6 @@ public class Car implements Runnable {
       System.out.println(this.name + " готовится");
       Thread.sleep(500 + (int) (Math.random() * 800));
       System.out.println(this.name + " готов");
-      cdl.countDown();
     } catch (Exception e) {
       e.printStackTrace();
     }
