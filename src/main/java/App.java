@@ -1,5 +1,6 @@
 public class App {
   public static void main(String[] args) {
+
     System.out.println("main");
 
     int[] test4_1 = new int[] { 1, 1, 1, 4, 4, 1, 4, 4 }; // true
