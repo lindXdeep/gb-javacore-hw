@@ -4,3 +4,4 @@ out/
 LICENSE
 .project
 .settings/
+target/
