@@ -1,6 +1,3 @@
-out/
-.vscode/
-.dccache
-LICENSE
-.project
 .settings/
+.vscode/
+.project
