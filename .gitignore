@@ -1,8 +1,0 @@
-.settings/
-.vscode/
-.project
-out/
-target/
-**/out/
-**/target/
-.gitignore
