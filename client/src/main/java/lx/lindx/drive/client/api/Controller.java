@@ -1,7 +1,5 @@
-package lx.lindx.drive.client;
+package lx.lindx.drive.client.api;
 
-import lx.lindx.drive.client.api.Auth;
-import lx.lindx.drive.client.api.Connect;
 import lx.lindx.drive.client.net.Protocol;
 import lx.lindx.drive.client.util.Util;
 
